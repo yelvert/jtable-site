@@ -1,0 +1,20 @@
+<h1>Listing widgets</h1>
+
+<div id="widgets"></div>
+
+<script type="text/javascript" charset="utf-8">
+  $("#widgets").jkoTable({
+    indexUrl: "/widgets.json",
+    editUrl: "/widgets/:identifier/edit",
+    destroyUrl: "/widgets/:identifier.js",
+    columns: [
+      {heading: 'ID', attribute: 'id'},
+      {heading: 'Name', attribute: 'name'},
+      {heading: 'Content', attribute: 'content'},
+      {heading: 'Test 1', attribute: 'test_1', dataType: 'boolean', trueValue: 'Yes', falseValue: 'No'},
+      {attribute: 'test_2', searchable: false}
+    ]
+  })
+</script>
+<br />
+<%= link_to 'New Widget', new_widget_path %>
