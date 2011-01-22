@@ -140,12 +140,19 @@
             changePage(@page-1)
           page_div.append(prev_page_link)
         if @settings.fullPagination
-          for i in [1..Math.ceil(@items.length/@settings.perPage)]
+          if Math.ceil(@items.length/@settings.perPage) == 0
             page_link = $("<a data-jTable-pagination-page='#{i}' href='#'>#{i}</a>")
             page_link.click (event) =>
               page = parseInt($(event.target).attr('data-jTable-pagination-page'), 10)
               changePage(page)
             page_div.append(page_link)
+          else
+            for i in [1..Math.ceil(@items.length/@settings.perPage)]
+              page_link = $("<a data-jTable-pagination-page='#{i}' href='#'>#{i}</a>")
+              page_link.click (event) =>
+                page = parseInt($(event.target).attr('data-jTable-pagination-page'), 10)
+                changePage(page)
+              page_div.append(page_link)
         unless @items.length <= @page*@settings.perPage
           next_page_link = $("<a href='#'>Next</a>")
           next_page_link.click (event) =>
