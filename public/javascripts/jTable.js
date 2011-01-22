@@ -1,10 +1,10 @@
-/* DO NOT MODIFY. This file was compiled Sat, 22 Jan 2011 05:32:27 GMT from
- * /Users/yelvert/projects/jkoTables/app/coffeescripts/jkoTables.coffee
+/* DO NOT MODIFY. This file was compiled Sat, 22 Jan 2011 05:59:25 GMT from
+ * /Users/yelvert/projects/jTable/app/coffeescripts/jTable.coffee
  */
 
 var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 (function($) {
-  $.jkoTable = {
+  $.jTable = {
     defaults: {
       settings: {
         columns: [],
@@ -29,7 +29,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
       }
     }
   };
-  return $.fn.jkoTable = function(options) {
+  return $.fn.jTable = function(options) {
     if (options == null) {
       options = {};
     }
@@ -66,7 +66,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
           item = items[_i];
           this.items.push(item);
         }
-        this.container.data('jkoTable').items = this.items;
+        this.container.data('jTable').items = this.items;
         updateTableRows();
         this.page = 1;
         return changePage(1);
@@ -83,7 +83,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           column = _ref[_i];
           th = $("<th></th>");
-          th.attr('data-jkoTable-column-attribute', column.attribute);
+          th.attr('data-jTable-column-attribute', column.attribute);
           if (column.heading === void 0) {
             th.html(column.attribute);
           } else {
@@ -121,15 +121,15 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         _results = [];
         for (i = 0, _len = _ref.length; i < _len; i++) {
           item = _ref[i];
-          new_row = $("<tr data-jkoTable-row-index='" + i + "'></tr>");
-          new_row.attr('data-jkoTable-item-identifier', item[this.settings.identifierAttribute]);
+          new_row = $("<tr data-jTable-row-index='" + i + "'></tr>");
+          new_row.attr('data-jTable-item-identifier', item[this.settings.identifierAttribute]);
           _ref2 = this.settings.columns;
           for (_i = 0, _len2 = _ref2.length; _i < _len2; _i++) {
             column = _ref2[_i];
             new_cell = $('<td></td>');
             new_cell.attr({
-              'data-jkoTable-cell-attribute': column.attribute,
-              'data-jkoTable-cell-value': item[column.attribute]
+              'data-jTable-cell-attribute': column.attribute,
+              'data-jTable-cell-value': item[column.attribute]
             });
             if (column.dataType === 'boolean') {
               if (item[column.attribute]) {
@@ -151,10 +151,10 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
             }
             if (this.settings.destroyLink) {
               destroy_link = $("<a href='#'}>Destroy</a>");
-              destroy_link.attr('data-jkoTable-destroy-url', this.settings.destroyUrl.replace(/\:identifier/, item[this.settings.identifierAttribute]));
+              destroy_link.attr('data-jTable-destroy-url', this.settings.destroyUrl.replace(/\:identifier/, item[this.settings.identifierAttribute]));
               destroy_link.click(__bind(function(event) {
                 $.ajax({
-                  url: $(event.target).attr('data-jkoTable-destroy-url'),
+                  url: $(event.target).attr('data-jTable-destroy-url'),
                   type: 'POST',
                   data: {
                     '_method': 'DELETE'
@@ -177,13 +177,16 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         return _results;
       }, this);
       addSearch = __bind(function() {
-        var search_field;
+        var search_container, search_field;
         search_field = $('<input type="text" />');
         search_field.keyup(__bind(function() {
           this.query.search = search_field.val();
           return fetchItems();
         }, this));
-        return this.container.prepend(search_field);
+        search_container = $('<div></div>');
+        search_container.html('Search: ');
+        search_container.append(search_field);
+        return this.container.prepend(search_container);
       }, this);
       updatePagination = __bind(function() {
         var i, next_page_link, page_div, page_link, prev_page_link, _ref;
@@ -198,16 +201,16 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         }
         if (this.settings.fullPagination) {
           for (i = 1, _ref = Math.ceil(this.items.length / this.settings.perPage); (1 <= _ref ? i <= _ref : i >= _ref); (1 <= _ref ? i += 1 : i -= 1)) {
-            page_link = $("<a data-jkoTable-pagination-page='" + i + "' href='#'>" + i + "</a>");
+            page_link = $("<a data-jTable-pagination-page='" + i + "' href='#'>" + i + "</a>");
             page_link.click(__bind(function(event) {
               var page;
-              page = parseInt($(event.target).attr('data-jkoTable-pagination-page'), 10);
+              page = parseInt($(event.target).attr('data-jTable-pagination-page'), 10);
               return changePage(page);
             }, this));
             page_div.append(page_link);
           }
         }
-        if (!(this.items.length < this.page * this.settings.perPage)) {
+        if (!(this.items.length <= this.page * this.settings.perPage)) {
           next_page_link = $("<a href='#'>Next</a>");
           next_page_link.click(__bind(function(event) {
             return changePage(this.page + 1);
@@ -218,30 +221,28 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
       }, this);
       changePage = __bind(function(new_page) {
         var i;
-        alert(this.page);
         this.page = new_page;
-        alert(this.page);
-        $('tr[data-jkoTable-row-index]', this.table).hide();
+        $('tr[data-jTable-row-index]', this.table).hide();
         i = (this.page - 1) * this.settings.perPage;
         while (i < this.page * this.settings.perPage) {
-          $("tr[data-jkoTable-row-index='" + i + "']", this.table).show();
+          $("tr[data-jTable-row-index='" + i + "']", this.table).show();
           i++;
         }
         return updatePagination();
       }, this);
-      this.settings = $.jkoTable.defaults.settings;
+      this.settings = $.jTable.defaults.settings;
       this.query = {};
       $.extend(true, this.settings, options);
       _ref = this.settings.columns;
       for (i = 0, _len = _ref.length; i < _len; i++) {
         column = _ref[i];
-        this.settings.columns[i] = $.extend(true, {}, $.jkoTable.defaults.column, column);
+        this.settings.columns[i] = $.extend(true, {}, $.jTable.defaults.column, column);
       }
       generateBaseQuery();
       this.container = $(this);
       this.items = [];
-      this.container.data('jkoTable', {});
-      this.container.data('jkoTable').settings = this.settings;
+      this.container.data('jTable', {});
+      this.container.data('jTable').settings = this.settings;
       this.table = null;
       this.page = 1;
       fetchItems();

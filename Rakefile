@@ -4,4 +4,4 @@
 require File.expand_path('../config/application', __FILE__)
 require 'rake'
 
-JkoTables::Application.load_tasks
+JTable::Application.load_tasks

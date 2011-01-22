@@ -1,5 +1,5 @@
 (($) ->
-  $.jkoTable =
+  $.jTable =
     defaults:
       settings:
         columns: []
@@ -20,7 +20,7 @@
         trueValue: 'True',
         falseValue: 'False'
   
-  $.fn.jkoTable = (options = {}) ->
+  $.fn.jTable = (options = {}) ->
     this.each ->
       
       generateBaseQuery = =>
@@ -42,7 +42,7 @@
         @items = []
         for item in items
           @items.push item
-        @container.data('jkoTable').items = @items
+        @container.data('jTable').items = @items
         updateTableRows()
         @page = 1
         changePage(1)
@@ -56,7 +56,7 @@
         table_head = $('thead', @table)
         for column in @settings.columns
           th = $("<th></th>")
-          th.attr('data-jkoTable-column-attribute', column.attribute)
+          th.attr('data-jTable-column-attribute', column.attribute)
           if column.heading is undefined
             th.html(column.attribute)
           else
@@ -83,11 +83,11 @@
         table_body = $('tbody', @table)
         table_body.html('')
         for item, i in @items
-          new_row = $("<tr data-jkoTable-row-index='#{i}'></tr>")
-          new_row.attr('data-jkoTable-item-identifier', item[@settings.identifierAttribute])
+          new_row = $("<tr data-jTable-row-index='#{i}'></tr>")
+          new_row.attr('data-jTable-item-identifier', item[@settings.identifierAttribute])
           for column in @settings.columns
             new_cell = $('<td></td>')
-            new_cell.attr({'data-jkoTable-cell-attribute': column.attribute, 'data-jkoTable-cell-value': item[column.attribute]})
+            new_cell.attr({'data-jTable-cell-attribute': column.attribute, 'data-jTable-cell-value': item[column.attribute]})
             if column.dataType is 'boolean'
               if item[column.attribute]
                 new_cell.html(column.trueValue)
@@ -104,10 +104,10 @@
               actions_cell.append(edit_link)
             if @settings.destroyLink
               destroy_link = $("<a href='#'}>Destroy</a>")
-              destroy_link.attr('data-jkoTable-destroy-url', @settings.destroyUrl.replace(/\:identifier/, item[@settings.identifierAttribute]))
+              destroy_link.attr('data-jTable-destroy-url', @settings.destroyUrl.replace(/\:identifier/, item[@settings.identifierAttribute]))
               destroy_link.click (event) =>
                 $.ajax({
-                  url: $(event.target).attr('data-jkoTable-destroy-url'),
+                  url: $(event.target).attr('data-jTable-destroy-url'),
                   type: 'POST',
                   data: {'_method': 'DELETE'},
                   success: (data, status, xhr) =>
@@ -126,7 +126,10 @@
         search_field.keyup =>
           @query.search = search_field.val()
           fetchItems()
-        @container.prepend(search_field)
+        search_container = $('<div></div>')
+        search_container.html('Search: ')
+        search_container.append(search_field)
+        @container.prepend(search_container)
         
       updatePagination = =>
         $('div.pagination-container', @container).remove()
@@ -138,12 +141,12 @@
           page_div.append(prev_page_link)
         if @settings.fullPagination
           for i in [1..Math.ceil(@items.length/@settings.perPage)]
-            page_link = $("<a data-jkoTable-pagination-page='#{i}' href='#'>#{i}</a>")
+            page_link = $("<a data-jTable-pagination-page='#{i}' href='#'>#{i}</a>")
             page_link.click (event) =>
-              page = parseInt($(event.target).attr('data-jkoTable-pagination-page'), 10)
+              page = parseInt($(event.target).attr('data-jTable-pagination-page'), 10)
               changePage(page)
             page_div.append(page_link)
-        unless @items.length < @page*@settings.perPage
+        unless @items.length <= @page*@settings.perPage
           next_page_link = $("<a href='#'>Next</a>")
           next_page_link.click (event) =>
             changePage(@page+1)
@@ -152,23 +155,23 @@
         
       changePage = (new_page) =>
         @page = new_page
-        $('tr[data-jkoTable-row-index]',@table).hide()
+        $('tr[data-jTable-row-index]',@table).hide()
         i = (@page-1)*@settings.perPage
         while (i < @page*@settings.perPage)
-          $("tr[data-jkoTable-row-index='#{i}']",@table).show()
+          $("tr[data-jTable-row-index='#{i}']",@table).show()
           i++
         updatePagination()
       
-      @settings = $.jkoTable.defaults.settings
+      @settings = $.jTable.defaults.settings
       @query = {}
       $.extend true, @settings, options
       for column, i in @settings.columns
-        @settings.columns[i] = $.extend true, {}, $.jkoTable.defaults.column, column
+        @settings.columns[i] = $.extend true, {}, $.jTable.defaults.column, column
       generateBaseQuery()
       @container = $(this)
       @items = []
-      @container.data('jkoTable', {})
-      @container.data('jkoTable').settings = @settings
+      @container.data('jTable', {})
+      @container.data('jTable').settings = @settings
       @table = null
       @page = 1
       fetchItems()
