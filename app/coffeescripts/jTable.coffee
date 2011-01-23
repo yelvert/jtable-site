@@ -23,6 +23,11 @@
   $.fn.jTable = (options = {}) ->
     this.each ->
       
+      buildAll = =>
+        buildTopToolbar()
+        buildTable()
+        fetchItems()
+        
       generateBaseQuery = =>
         searchable_columns = []
         for column in @settings.columns
@@ -47,37 +52,50 @@
         @page = 1
         changePage(1)
         
+      buildTopToolbar = =>
+        toolbar = $('<div class="ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix jTable-top-toolbar"></div>')
+        @container.append(toolbar)
+        buildSearch()
+        
       buildTable = =>
-        @container.html('<table><thead><tr><th></th></tr></thead><tbody></tbody></table>')
+        @container.append('<table class="ui-widget"><thead><tr><th></th></tr></thead><tbody></tbody></table>')
         @table = $('table', @element)
         buildTableHead()
         
       buildTableHead = =>
         table_head = $('thead', @table)
         for column in @settings.columns
-          th = $("<th></th>")
+          th = $('<th class="ui-state-default jTable-column-heading"></th>')
           th.attr('data-jTable-column-attribute', column.attribute)
           if column.heading is undefined
-            th.html(column.attribute)
+            th.html("<div>#{column.attribute}</div>")
           else
-            th.html(column.heading)
-          th.click column.attribute, (event) =>
-            attribute = event.data
-            if @query.sort_column is attribute
-              if @query.sort_direction is ''
-                @query.sort_direction = 'ASC'
-              else if @query.sort_direction is 'ASC'
-                @query.sort_direction = 'DESC'
+            th.html("<div>#{column.heading}</div>")
+          if column.sortable
+            $('div',th).append('<span class="css_right ui-icon ui-icon-carat-2-n-s"></span>')
+            th.click column.attribute, (event) =>
+              $('.jTable-column-heading span').removeClass('ui-icon-triangle-1-n ui-icon-triangle-1-s')
+              attribute = event.data
+              if @query.sort_column is attribute
+                console.log event.target
+                if @query.sort_direction is ''
+                  @query.sort_direction = 'ASC'
+                  $('span', $(event.currentTarget)).addClass('ui-icon-triangle-1-n')
+                else if @query.sort_direction is 'ASC'
+                  @query.sort_direction = 'DESC'
+                  $('span', $(event.currentTarget)).addClass('ui-icon-triangle-1-s')
+                else
+                  @query.sort_column = ''
+                  @query.sort_direction = ''
+                  $('span', $(event.currentTarget)).addClass('ui-icon-carat-2-n-s')
               else
-                @query.sort_column = ''
-                @query.sort_direction = ''
-            else
-              @query.sort_column = attribute
-              @query.sort_direction = 'ASC'
-            fetchItems()
+                @query.sort_column = attribute
+                @query.sort_direction = 'ASC'
+                $('span', $(event.currentTarget)).addClass('ui-icon-triangle-1-n')
+              fetchItems()
           table_head.append($(th))
         if @settings.editLink or @settings.destroyLink
-          table_head.append($("<th></th>"))
+          table_head.append($('<th class="ui-state-default jTable-column-heading">&nbsp</th>'))
         
       updateTableRows = =>
         table_body = $('tbody', @table)
@@ -121,15 +139,16 @@
             new_row.append(actions_cell)
           table_body.append(new_row)
         
-      addSearch = =>
+      buildSearch = =>
+        $('.jTable-full-search-container.').remove()
         search_field = $('<input type="text" />')
         search_field.keyup =>
           @query.search = search_field.val()
           fetchItems()
-        search_container = $('<div></div>')
+        search_container = $('<div class="css_left jTable-full-search-container"></div>')
         search_container.html('Search: ')
         search_container.append(search_field)
-        @container.prepend(search_container)
+        $('.jTable-top-toolbar', @container).prepend(search_container)
         
       updatePagination = =>
         $('div.pagination-container', @container).remove()
@@ -168,7 +187,8 @@
           $("tr[data-jTable-row-index='#{i}']",@table).show()
           i++
         updatePagination()
-      
+        
+        
       @settings = $.jTable.defaults.settings
       @query = {}
       $.extend true, @settings, options
@@ -176,14 +196,13 @@
         @settings.columns[i] = $.extend true, {}, $.jTable.defaults.column, column
       generateBaseQuery()
       @container = $(this)
+      @container.addClass('ui-widget jTable-container')
       @items = []
       @container.data('jTable', {})
       @container.data('jTable').settings = @settings
       @table = null
       @page = 1
-      fetchItems()
-      buildTable()
-      addSearch()
+      buildAll()
       changePage(1)
     
 )(jQuery);

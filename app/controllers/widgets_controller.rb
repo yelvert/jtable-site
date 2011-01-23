@@ -6,9 +6,14 @@ class WidgetsController < ApplicationController
       query = params[:query]
       unless query[:search].blank?
         where_clause = []
-        where_clause << query[:searchable_columns].collect {|column| "widgets.#{column} LIKE :query_string"}.join(" OR ")
-        where_clause << {:query_string => "%#{query[:search]}%"}
+        columns_hash = {}
+        where_clause << query[:searchable_columns].collect do |column|
+          columns_hash[column.to_sym] = column
+          "#{column.to_sym} LIKE :query_string"
+        end.join(" OR ")
+        where_clause << columns_hash.merge({:query_string => "%#{query[:search]}%"})
       end
+      Rails.logger.info where_clause.inspect
       unless query[:sort_column].blank? and query[:sort_direction].blank?
         order_clause = "#{query[:sort_column]} #{query[:sort_direction]}"
       end

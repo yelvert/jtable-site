@@ -1,0 +1,29 @@
+.jTable-container {
+  width: 100%;
+}
+
+.jTable-container table {
+  border-spacing: 0;
+  border-padding: 0;
+  width: 100%;
+}
+
+.jTable-column-heading {
+  
+}
+
+.jTable-column-heading div {
+  position: relative;
+  padding-right: 20px;
+}
+
+.jTable-column-heading div span {
+  position: absolute;
+  top: 50%;
+  margin-top: -8px;
+  right: 0;
+}
+
+.ui-toolbar {
+  padding: 5px;
+}
