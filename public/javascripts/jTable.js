@@ -1,4 +1,4 @@
-/* DO NOT MODIFY. This file was compiled Sun, 23 Jan 2011 08:50:20 GMT from
+/* DO NOT MODIFY. This file was compiled Sun, 23 Jan 2011 08:55:18 GMT from
  * /Users/yelvert/projects/jTable/app/coffeescripts/jTable.coffee
  */
 
@@ -55,20 +55,20 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         return this.query.search = "";
       }, this);
       fetchItems = __bind(function() {
-        var ajax, current_data;
-        if (this.query.search !== this.previous_search || this.query.search === "") {
-          current_data = $.extend(true, {}, this.query);
+        var ajax, current_query;
+        if (this.query !== this.previous_query || this.query.search === "") {
+          current_query = $.extend(true, {}, this.query);
           ajax = $.ajax({
             url: this.settings.indexUrl,
             data: {
-              query: current_data
+              query: current_query
             },
             cache: false,
             success: __bind(function(data, textStatus, XMLHttpRequest) {
               return updateItems(data);
             }, this)
           });
-          return this.previous_search = current_data.search;
+          return this.previous_query = $.extend(true, {}, current_query);
         }
       }, this);
       updateItems = __bind(function(items) {
@@ -288,7 +288,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
       this.items = [];
       this.container.data('jTable', {});
       this.container.data('jTable').settings = this.settings;
-      this.previous_search = "";
+      this.previous_query = $.extend(true, {}, this.query);
       this.table = null;
       this.page = 1;
       buildAll();

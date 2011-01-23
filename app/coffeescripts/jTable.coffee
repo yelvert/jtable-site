@@ -38,16 +38,16 @@
         @query.search = ""
         
       fetchItems = =>
-        if @query.search != @previous_search or @query.search == ""
-          current_data = $.extend(true, {}, @query)
+        if @query != @previous_query or @query.search == ""
+          current_query = $.extend(true, {}, @query)
           ajax = $.ajax({
             url: @settings.indexUrl
-            data: {query: current_data}
+            data: {query: current_query}
             cache: false
             success: (data, textStatus, XMLHttpRequest) =>
               updateItems(data)
           })
-          @previous_search = current_data.search
+          @previous_query = $.extend(true, {}, current_query)
         
       updateItems = (items) =>
         @items = []
@@ -210,7 +210,7 @@
       @items = []
       @container.data('jTable', {})
       @container.data('jTable').settings = @settings
-      @previous_search = ""
+      @previous_query = $.extend(true, {}, @query)
       @table = null
       @page = 1
       buildAll()
