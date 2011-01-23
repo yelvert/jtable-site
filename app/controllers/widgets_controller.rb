@@ -2,25 +2,22 @@ class WidgetsController < ApplicationController
   # GET /widgets
   # GET /widgets.xml
   def index
+    @widgets = Widget
     if params[:query]
       query = params[:query]
       unless query[:search].blank?
-        where_clause = []
-        columns_hash = {}
-        where_clause << query[:searchable_columns].collect do |column|
-          columns_hash[column.to_sym] = column
-          "#{column.to_sym} LIKE :query_string"
-        end.join(" OR ")
-        where_clause << columns_hash.merge({:query_string => "%#{query[:search]}%"})
+        where_query = []
+        query[:searchable_columns].each do |column|
+          where_query << Widget.arel_table[column.to_sym].matches("%#{query[:search]}%")
+        end
+        @widgets = Widget.where(where_query.inject(&:or))
+        
       end
-      Rails.logger.info where_clause.inspect
       unless query[:sort_column].blank? and query[:sort_direction].blank?
-        order_clause = "#{query[:sort_column]} #{query[:sort_direction]}"
+        @widgets = @widgets.order("#{query[:sort_column]} #{query[:sort_direction]}")
       end
-      @widgets = Widget.where(where_clause).order(order_clause)
-    else
-      @widgets = Widget.all
     end
+    @widgets = @widgets.all
 
     respond_to do |format|
       format.html # index.html.erb
