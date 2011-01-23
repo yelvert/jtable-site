@@ -31,8 +31,10 @@ module JTable
     # config.i18n.default_locale = :de
 
     # JavaScript files you want as :defaults (application.js is always included).
-    config.action_view.javascript_expansions[:defaults] = %w(jquery rails)
-    config.action_view.javascript_expansions[:jTable] = %w(knockout jTable)
+    config.action_view.javascript_expansions[:jquery14] = %w(jquery.1.4.4.js)
+    config.action_view.javascript_expansions[:jquery15] = %w(jquery.1.5.js)
+    config.action_view.javascript_expansions[:defaults] = %w(rails)
+    config.action_view.javascript_expansions[:jTable] = %w(jTable)
     
     config.action_view.stylesheet_expansions[:defaults] = [
       "http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.7/themes/cupertino/jquery-ui.css"

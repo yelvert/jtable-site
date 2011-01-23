@@ -6,6 +6,7 @@
         identifierAttribute: 'id'
         perPage: 25
         fullPagination: true
+        ajaxInterval: 250
         indexUrl: ""
         editLink: true
         editUrl: "edit?id=:identifier"
@@ -34,14 +35,19 @@
           if column.searchable
             searchable_columns.push(column.attribute)
         @query.searchable_columns = searchable_columns
+        @query.search = ""
         
       fetchItems = =>
-        ajax = $.ajax({
-          url: @settings.indexUrl,
-          data: {query: @query}
-          success: (data, textStatus, XMLHttpRequest) =>
-            updateItems(data)
-        })
+        if @query.search != @previous_search or @query.search == ""
+          current_data = $.extend(true, {}, @query)
+          ajax = $.ajax({
+            url: @settings.indexUrl
+            data: {query: current_data}
+            cache: false
+            success: (data, textStatus, XMLHttpRequest) =>
+              updateItems(data)
+          })
+          @previous_search = current_data.search
         
       updateItems = (items) =>
         @items = []
@@ -144,7 +150,11 @@
         search_field = $('<input type="text" />')
         search_field.keyup =>
           @query.search = search_field.val()
-          fetchItems()
+          current_search = String(@query.search)
+          setTimeout(=>
+            if current_search == search_field.val()
+              fetchItems()
+          @settings.ajaxInterval)
         search_container = $('<div class="css_left jTable-full-search-container"></div>')
         search_container.html('Search: ')
         search_container.append(search_field)
@@ -200,6 +210,7 @@
       @items = []
       @container.data('jTable', {})
       @container.data('jTable').settings = @settings
+      @previous_search = ""
       @table = null
       @page = 1
       buildAll()

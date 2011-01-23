@@ -1,4 +1,4 @@
-/* DO NOT MODIFY. This file was compiled Sun, 23 Jan 2011 00:53:49 GMT from
+/* DO NOT MODIFY. This file was compiled Sun, 23 Jan 2011 08:50:20 GMT from
  * /Users/yelvert/projects/jTable/app/coffeescripts/jTable.coffee
  */
 
@@ -11,6 +11,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         identifierAttribute: 'id',
         perPage: 25,
         fullPagination: true,
+        ajaxInterval: 250,
         indexUrl: "",
         editLink: true,
         editUrl: "edit?id=:identifier",
@@ -50,19 +51,25 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
             searchable_columns.push(column.attribute);
           }
         }
-        return this.query.searchable_columns = searchable_columns;
+        this.query.searchable_columns = searchable_columns;
+        return this.query.search = "";
       }, this);
       fetchItems = __bind(function() {
-        var ajax;
-        return ajax = $.ajax({
-          url: this.settings.indexUrl,
-          data: {
-            query: this.query
-          },
-          success: __bind(function(data, textStatus, XMLHttpRequest) {
-            return updateItems(data);
-          }, this)
-        });
+        var ajax, current_data;
+        if (this.query.search !== this.previous_search || this.query.search === "") {
+          current_data = $.extend(true, {}, this.query);
+          ajax = $.ajax({
+            url: this.settings.indexUrl,
+            data: {
+              query: current_data
+            },
+            cache: false,
+            success: __bind(function(data, textStatus, XMLHttpRequest) {
+              return updateItems(data);
+            }, this)
+          });
+          return this.previous_search = current_data.search;
+        }
       }, this);
       updateItems = __bind(function(items) {
         var item, _i, _len;
@@ -201,8 +208,14 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         $('.jTable-full-search-container.').remove();
         search_field = $('<input type="text" />');
         search_field.keyup(__bind(function() {
+          var current_search;
           this.query.search = search_field.val();
-          return fetchItems();
+          current_search = String(this.query.search);
+          return setTimeout(__bind(function() {
+            if (current_search === search_field.val()) {
+              return fetchItems();
+            }
+          }, this), this.settings.ajaxInterval);
         }, this));
         search_container = $('<div class="css_left jTable-full-search-container"></div>');
         search_container.html('Search: ');
@@ -275,6 +288,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
       this.items = [];
       this.container.data('jTable', {});
       this.container.data('jTable').settings = this.settings;
+      this.previous_search = "";
       this.table = null;
       this.page = 1;
       buildAll();

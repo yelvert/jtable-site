@@ -2,22 +2,7 @@ class WidgetsController < ApplicationController
   # GET /widgets
   # GET /widgets.xml
   def index
-    @widgets = Widget
-    if params[:query]
-      query = params[:query]
-      unless query[:search].blank?
-        where_query = []
-        query[:searchable_columns].each do |column|
-          where_query << Widget.arel_table[column.to_sym].matches("%#{query[:search]}%")
-        end
-        @widgets = Widget.where(where_query.inject(&:or))
-        
-      end
-      unless query[:sort_column].blank? and query[:sort_direction].blank?
-        @widgets = @widgets.order("#{query[:sort_column]} #{query[:sort_direction]}")
-      end
-    end
-    @widgets = @widgets.all
+    @widgets = Widget.from_query(params[:query]).all
 
     respond_to do |format|
       format.html # index.html.erb
