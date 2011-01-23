@@ -4,15 +4,16 @@
 
 <script type="text/javascript" charset="utf-8">
   $("#widgets").jTable({
+    width: '700px',
     indexUrl: "/widgets.json",
     editUrl: "/widgets/:identifier/edit",
     destroyUrl: "/widgets/:identifier.js",
     columns: [
       {heading: 'ID', attribute: 'id'},
       {heading: 'Name', attribute: 'name'},
-      {heading: 'Content', attribute: 'content'},
+      {heading: 'Content', attribute: 'content', columnClass: 'center'},
       {heading: 'Test 1', attribute: 'test_1', dataType: 'boolean', trueValue: 'Yes', falseValue: 'No'},
-      {attribute: 'test_2', searchable: false}
+      {attribute: 'test_2', searchable: false, sortable: false}
     ]
   })
 </script>

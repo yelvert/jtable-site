@@ -8,6 +8,12 @@
   width: 100%;
 }
 
+.jTable-container table td {
+  font-size: 1em;
+  color: black;
+  font-weight: normal;
+}
+
 .jTable-column-heading {
   
 }
@@ -24,6 +30,31 @@
   right: 0;
 }
 
+.jTable-row-odd {
+  background-color: #AED0EA;
+}
+
+.jTable-row-even {
+  background-color: #D7EBF9;
+}
+
+.jTable-actions-cell {
+  
+}
+
+.jTable-actions-cell a {
+  padding: 0 5px;
+}
+
+.center {
+  text-align: center;
+}
+
 .ui-toolbar {
   padding: 5px;
+}
+
+.ui-state-default a, .ui-state-default a:link, .ui-state-default a:visited {
+  color: black;
+  text-decoration: none;
 }

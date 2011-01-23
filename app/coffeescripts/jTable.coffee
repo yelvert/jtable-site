@@ -7,19 +7,22 @@
         perPage: 25
         fullPagination: true
         ajaxInterval: 250
-        indexUrl: ""
+        rowClass: ''
+        width: ''
+        indexUrl: ''
         editLink: true
-        editUrl: "edit?id=:identifier"
+        editUrl: 'edit?id=:identifier'
         destroyLink: true
-        destroyUrl: "?id=:identifier"
+        destroyUrl: '?id=:identifier'
         onDestroy: ->
-          alert("Item successfully destroyed.")
+          alert('Item successfully destroyed.')
       column:
         searchable: true
         sortable: true
         dataType: 'string'
-        trueValue: 'True',
+        trueValue: 'True'
         falseValue: 'False'
+        columnClass: ''
   
   $.fn.jTable = (options = {}) ->
     this.each ->
@@ -64,7 +67,7 @@
         buildSearch()
         
       buildTable = =>
-        @container.append('<table class="ui-widget"><thead><tr><th></th></tr></thead><tbody></tbody></table>')
+        @container.append('<div class="ui-state-default"><table class="ui-widget"><thead></thead><tbody></tbody></table></div>')
         @table = $('table', @element)
         buildTableHead()
         
@@ -79,25 +82,25 @@
             th.html("<div>#{column.heading}</div>")
           if column.sortable
             $('div',th).append('<span class="css_right ui-icon ui-icon-carat-2-n-s"></span>')
-            th.click column.attribute, (event) =>
+            th.click =>
               $('.jTable-column-heading span').removeClass('ui-icon-triangle-1-n ui-icon-triangle-1-s')
-              attribute = event.data
+              attribute = column.attribute
+              sort_icon = $('span', $(event.currentTarget))
               if @query.sort_column is attribute
-                console.log event.target
                 if @query.sort_direction is ''
                   @query.sort_direction = 'ASC'
-                  $('span', $(event.currentTarget)).addClass('ui-icon-triangle-1-n')
+                  sort.addClass('ui-icon-triangle-1-n')
                 else if @query.sort_direction is 'ASC'
                   @query.sort_direction = 'DESC'
-                  $('span', $(event.currentTarget)).addClass('ui-icon-triangle-1-s')
+                  sort_icon.addClass('ui-icon-triangle-1-s')
                 else
                   @query.sort_column = ''
                   @query.sort_direction = ''
-                  $('span', $(event.currentTarget)).addClass('ui-icon-carat-2-n-s')
+                  sort_icon.addClass('ui-icon-carat-2-n-s')
               else
                 @query.sort_column = attribute
                 @query.sort_direction = 'ASC'
-                $('span', $(event.currentTarget)).addClass('ui-icon-triangle-1-n')
+                sort_icon.addClass('ui-icon-triangle-1-n')
               fetchItems()
           table_head.append($(th))
         if @settings.editLink or @settings.destroyLink
@@ -108,9 +111,15 @@
         table_body.html('')
         for item, i in @items
           new_row = $("<tr data-jTable-row-index='#{i}'></tr>")
+          if i%2==0
+            new_row.addClass("jTable-row-even")
+          else
+            new_row.addClass("jTable-row-odd")
+          new_row.addClass(@settings.rowClass)
           new_row.attr('data-jTable-item-identifier', item[@settings.identifierAttribute])
           for column in @settings.columns
-            new_cell = $('<td></td>')
+            new_cell = $('<td class="jTable-cell"></td>')
+            new_cell.addClass(column.columnClass)
             new_cell.attr({'data-jTable-cell-attribute': column.attribute, 'data-jTable-cell-value': item[column.attribute]})
             if column.dataType is 'boolean'
               if item[column.attribute]
@@ -121,22 +130,21 @@
               new_cell.html(item[column.attribute])
             new_row.append(new_cell)
           if @settings.editLink or @settings.destroyLink
-            actions_cell = $("<td></td>")
+            actions_cell = $('<td class="jTable-actions-cell jTable-cell"></td>')
             if @settings.editLink
               edit_link = $("<a>Edit</a>")
               edit_link.attr('href', @settings.editUrl.replace(/\:identifier/, item[@settings.identifierAttribute]))
               actions_cell.append(edit_link)
             if @settings.destroyLink
-              destroy_link = $("<a href='#'}>Destroy</a>")
+              destroy_link = $("<a href='#'>Destroy</a>")
               destroy_link.attr('data-jTable-destroy-url', @settings.destroyUrl.replace(/\:identifier/, item[@settings.identifierAttribute]))
               destroy_link.click (event) =>
                 $.ajax({
-                  url: $(event.target).attr('data-jTable-destroy-url'),
-                  type: 'POST',
-                  data: {'_method': 'DELETE'},
+                  url: $(event.target).attr('data-jTable-destroy-url')
+                  type: 'POST'
+                  data: {'_method': 'DELETE'}
                   success: (data, status, xhr) =>
                     @settings.onDestroy(data)
-                  ,
                   error: (xhr, status, error) =>
                     element.trigger('ajax:error', [xhr, status, error]);
                 })
@@ -206,6 +214,8 @@
         @settings.columns[i] = $.extend true, {}, $.jTable.defaults.column, column
       generateBaseQuery()
       @container = $(this)
+      if @settings.width != ''
+        @container.css({width: @settings.width})
       @container.addClass('ui-widget jTable-container')
       @items = []
       @container.data('jTable', {})

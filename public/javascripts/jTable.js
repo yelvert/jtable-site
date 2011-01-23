@@ -1,4 +1,4 @@
-/* DO NOT MODIFY. This file was compiled Sun, 23 Jan 2011 08:55:18 GMT from
+/* DO NOT MODIFY. This file was compiled Sun, 23 Jan 2011 10:48:30 GMT from
  * /Users/yelvert/projects/jTable/app/coffeescripts/jTable.coffee
  */
 
@@ -12,13 +12,15 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         perPage: 25,
         fullPagination: true,
         ajaxInterval: 250,
-        indexUrl: "",
+        rowClass: '',
+        width: '',
+        indexUrl: '',
         editLink: true,
-        editUrl: "edit?id=:identifier",
+        editUrl: 'edit?id=:identifier',
         destroyLink: true,
-        destroyUrl: "?id=:identifier",
+        destroyUrl: '?id=:identifier',
         onDestroy: function() {
-          return alert("Item successfully destroyed.");
+          return alert('Item successfully destroyed.');
         }
       },
       column: {
@@ -26,7 +28,8 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         sortable: true,
         dataType: 'string',
         trueValue: 'True',
-        falseValue: 'False'
+        falseValue: 'False',
+        columnClass: ''
       }
     }
   };
@@ -90,7 +93,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         return buildSearch();
       }, this);
       buildTable = __bind(function() {
-        this.container.append('<table class="ui-widget"><thead><tr><th></th></tr></thead><tbody></tbody></table>');
+        this.container.append('<div class="ui-state-default"><table class="ui-widget"><thead></thead><tbody></tbody></table></div>');
         this.table = $('table', this.element);
         return buildTableHead();
       }, this);
@@ -109,27 +112,27 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
           }
           if (column.sortable) {
             $('div', th).append('<span class="css_right ui-icon ui-icon-carat-2-n-s"></span>');
-            th.click(column.attribute, __bind(function(event) {
-              var attribute;
+            th.click(__bind(function() {
+              var attribute, sort_icon;
               $('.jTable-column-heading span').removeClass('ui-icon-triangle-1-n ui-icon-triangle-1-s');
-              attribute = event.data;
+              attribute = column.attribute;
+              sort_icon = $('span', $(event.currentTarget));
               if (this.query.sort_column === attribute) {
-                console.log(event.target);
                 if (this.query.sort_direction === '') {
                   this.query.sort_direction = 'ASC';
-                  $('span', $(event.currentTarget)).addClass('ui-icon-triangle-1-n');
+                  sort.addClass('ui-icon-triangle-1-n');
                 } else if (this.query.sort_direction === 'ASC') {
                   this.query.sort_direction = 'DESC';
-                  $('span', $(event.currentTarget)).addClass('ui-icon-triangle-1-s');
+                  sort_icon.addClass('ui-icon-triangle-1-s');
                 } else {
                   this.query.sort_column = '';
                   this.query.sort_direction = '';
-                  $('span', $(event.currentTarget)).addClass('ui-icon-carat-2-n-s');
+                  sort_icon.addClass('ui-icon-carat-2-n-s');
                 }
               } else {
                 this.query.sort_column = attribute;
                 this.query.sort_direction = 'ASC';
-                $('span', $(event.currentTarget)).addClass('ui-icon-triangle-1-n');
+                sort_icon.addClass('ui-icon-triangle-1-n');
               }
               return fetchItems();
             }, this));
@@ -149,11 +152,18 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         for (i = 0, _len = _ref.length; i < _len; i++) {
           item = _ref[i];
           new_row = $("<tr data-jTable-row-index='" + i + "'></tr>");
+          if (i % 2 === 0) {
+            new_row.addClass("jTable-row-even");
+          } else {
+            new_row.addClass("jTable-row-odd");
+          }
+          new_row.addClass(this.settings.rowClass);
           new_row.attr('data-jTable-item-identifier', item[this.settings.identifierAttribute]);
           _ref2 = this.settings.columns;
           for (_i = 0, _len2 = _ref2.length; _i < _len2; _i++) {
             column = _ref2[_i];
-            new_cell = $('<td></td>');
+            new_cell = $('<td class="jTable-cell"></td>');
+            new_cell.addClass(column.columnClass);
             new_cell.attr({
               'data-jTable-cell-attribute': column.attribute,
               'data-jTable-cell-value': item[column.attribute]
@@ -170,14 +180,14 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
             new_row.append(new_cell);
           }
           if (this.settings.editLink || this.settings.destroyLink) {
-            actions_cell = $("<td></td>");
+            actions_cell = $('<td class="jTable-actions-cell jTable-cell"></td>');
             if (this.settings.editLink) {
               edit_link = $("<a>Edit</a>");
               edit_link.attr('href', this.settings.editUrl.replace(/\:identifier/, item[this.settings.identifierAttribute]));
               actions_cell.append(edit_link);
             }
             if (this.settings.destroyLink) {
-              destroy_link = $("<a href='#'}>Destroy</a>");
+              destroy_link = $("<a href='#'>Destroy</a>");
               destroy_link.attr('data-jTable-destroy-url', this.settings.destroyUrl.replace(/\:identifier/, item[this.settings.identifierAttribute]));
               destroy_link.click(__bind(function(event) {
                 $.ajax({
@@ -284,6 +294,11 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
       }
       generateBaseQuery();
       this.container = $(this);
+      if (this.settings.width !== '') {
+        this.container.css({
+          width: this.settings.width
+        });
+      }
       this.container.addClass('ui-widget jTable-container');
       this.items = [];
       this.container.data('jTable', {});
