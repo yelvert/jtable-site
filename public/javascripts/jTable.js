@@ -1,4 +1,4 @@
-/* DO NOT MODIFY. This file was compiled Mon, 24 Jan 2011 16:13:34 GMT from
+/* DO NOT MODIFY. This file was compiled Mon, 24 Jan 2011 18:22:04 GMT from
  * /Users/yelvert/projects/jTable/app/coffeescripts/jTable.coffee
  */
 
@@ -163,7 +163,6 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
       }, this);
       buildTableFoot = __bind(function() {
         var column, search_field, table_foot, th, _i, _len, _ref;
-        console.log("" + (this.container.attr('id')) + ": " + this.settings.singleColumnSearch);
         if (this.settings.singleColumnSearch) {
           table_foot = $('tfoot', this.table);
           _ref = this.settings.columns;
@@ -190,7 +189,6 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
             } else {
               th = $('<th class="jTable-column-footer">&nbsp;</th>');
             }
-            console.log(th);
             table_foot.append(th);
           }
           if (this.settings.editLink || this.settings.destroyLink) {

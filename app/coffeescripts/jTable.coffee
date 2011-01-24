@@ -123,7 +123,6 @@
           table_head.append($('<th class="jTable-column-heading">&nbsp</th>'))
         
       buildTableFoot = =>
-        console.log "#{@container.attr('id')}: #{@settings.singleColumnSearch}"
         if @settings.singleColumnSearch
           table_foot = $('tfoot', @table)
           for column in @settings.columns
@@ -144,7 +143,6 @@
               th.append(search_field)
             else
               th = $('<th class="jTable-column-footer">&nbsp;</th>')
-            console.log th
             table_foot.append(th)
           if @settings.editLink or @settings.destroyLink
             table_foot.append($('<th class="jTable-column-footer">&nbsp;</th>'))
