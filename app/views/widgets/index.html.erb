@@ -6,11 +6,12 @@
   $("#widgets1").jTable({
     width: '700px',
     serverSidePagination: true,
-    indexUrl: "/widgets.json",
+    singleColumnSearch: true,
+    indexUrl: "/widgets/server_side.json",
     editUrl: "/widgets/:identifier/edit",
     destroyUrl: "/widgets/:identifier.js",
     columns: [
-      {heading: 'ID', attribute: 'id', columnClass: 'center'},
+      {heading: 'ID', attribute: 'id', columnClass: 'left', searchable: false},
       {heading: 'Name', attribute: 'name', columnClass: 'left'},
       {heading: 'Content', attribute: 'content', columnClass: 'left'},
       {heading: 'Test 1', attribute: 'test_1', columnClass: 'center', dataType: 'boolean', trueValue: 'Yes', falseValue: 'No'},
@@ -24,15 +25,15 @@
 <div id="widgets2"></div>
 <script type="text/javascript" charset="utf-8">
   $("#widgets2").jTable({
-    width: '700px',
+    width: '800px',
     indexUrl: "/widgets.json",
     editUrl: "/widgets/:identifier/edit",
     destroyUrl: "/widgets/:identifier.js",
     columns: [
-      {heading: 'ID', attribute: 'id', columnClass: 'center'},
+      {heading: 'ID', attribute: 'id', columnClass: 'right'},
       {heading: 'Name', attribute: 'name', columnClass: 'left'},
       {heading: 'Content', attribute: 'content', columnClass: 'left'},
-      {heading: 'Test 1', attribute: 'test_1', columnClass: 'center', dataType: 'boolean', trueValue: 'Yes', falseValue: 'No'},
+      {heading: 'Test 1', attribute: 'test_1', columnClass: 'center', dataType: 'boolean'},
       {attribute: 'test_2', searchable: false, sortable: false, columnClass: 'right'}
     ]
   })

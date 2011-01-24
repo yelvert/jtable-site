@@ -109,6 +109,16 @@ dark-blue:    rgb(39,121,170)
   padding: 0 5px;
 }
 
+.jTable-column-footer {
+  border-left: 1px solid rgb(39,121,170);
+  border-top: 1px solid rgb(39,121,170);
+  color: rgb(39,121,170);
+}
+
+.jTable-column-footer:first-child {
+  border-left: none;
+}
+
 .jTable-bottom-toolbar {
   padding: 5px;
   -moz-border-radius-bottomright: 6px;

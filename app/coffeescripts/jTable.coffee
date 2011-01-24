@@ -4,6 +4,7 @@
       settings:
         columns: []
         identifierAttribute: 'id'
+        singleColumnSearch: false
         perPage: 25
         fullPagination: true
         serverSidePagination: false
@@ -43,6 +44,7 @@
         @query.search = ""
         @query.limit = @settings.perPage
         @query.offset = 0
+        @query.column_search = {}
         
       fetchItems = =>
         if @query != @previous_query or @query.search == ""
@@ -50,7 +52,7 @@
           @stale_paging = false
           ajax = $.ajax({
             url: @settings.indexUrl
-            data: {query: current_query}
+            data: {jTableQuery: current_query}
             cache: false
             success: (data, textStatus, XMLHttpRequest) =>
               updateItems(data)
@@ -79,9 +81,11 @@
         buildSearch()
         
       buildTable = =>
-        @container.append('<div class="jTable-table-container"><table class="jTable-table"><thead></thead><tbody></tbody></table></div>')
+        @container.append('<div class="jTable-table-container"><table class="jTable-table"><thead></thead><tbody></tbody><tfoot></tfoot></table></div>')
         @table = $('table', @container)
         buildTableHead()
+        if @settings.singleColumnSearch
+          buildTableFoot()
         
       buildTableHead = =>
         table_head = $('thead', @table)
@@ -117,6 +121,33 @@
           table_head.append($(th))
         if @settings.editLink or @settings.destroyLink
           table_head.append($('<th class="jTable-column-heading">&nbsp</th>'))
+        
+      buildTableFoot = =>
+        console.log "#{@container.attr('id')}: #{@settings.singleColumnSearch}"
+        if @settings.singleColumnSearch
+          table_foot = $('tfoot', @table)
+          for column in @settings.columns
+            if column.searchable
+              th = $('<th class="jTable-column-footer"></th>')
+              search_field = $("<input type='text' jTable-column-attribute='#{column.attribute}'>")
+              search_field.keyup =>
+                field = $(event.currentTarget)
+                attribute = field.attr('jTable-column-attribute')
+                @query.column_search[attribute] = field.val()
+                current_search = String(@query.column_search[attribute])
+                setTimeout(=>
+                  if current_search == field.val()
+                    @page = 1
+                    @query.offset = 0
+                    fetchItems()
+                @settings.ajaxInterval)
+              th.append(search_field)
+            else
+              th = $('<th class="jTable-column-footer">&nbsp;</th>')
+            console.log th
+            table_foot.append(th)
+          if @settings.editLink or @settings.destroyLink
+            table_foot.append($('<th class="jTable-column-footer">&nbsp;</th>'))
         
       updateTableRows = =>
         table_body = $('tbody', @table)
@@ -253,8 +284,7 @@
           updatePageInfo()
           updatePagination()
         
-        
-      @settings = $.jTable.defaults.settings
+      @settings = $.extend(true, {}, $.jTable.defaults.settings)
       @query = {}
       $.extend true, @settings, options
       for column, i in @settings.columns

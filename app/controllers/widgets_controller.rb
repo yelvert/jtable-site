@@ -2,7 +2,19 @@ class WidgetsController < ApplicationController
   # GET /widgets
   # GET /widgets.xml
   def index
-    @widgets = Widget.from_query(params[:query])
+    @widgets = Widget.from_query(params[:jTableQuery], false)
+
+    respond_to do |format|
+      format.html do
+        #@widgets = Widget.all
+      end
+      format.json { render :json => @widgets.all }
+      format.xml  { render :xml => @widgets }
+    end
+  end
+  
+  def server_side
+    @widgets = Widget.from_query(params[:jTableQuery], true)
 
     respond_to do |format|
       format.html do

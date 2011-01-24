@@ -1,4 +1,4 @@
-/* DO NOT MODIFY. This file was compiled Mon, 24 Jan 2011 12:37:52 GMT from
+/* DO NOT MODIFY. This file was compiled Mon, 24 Jan 2011 13:45:55 GMT from
  * /Users/yelvert/projects/jTable/app/coffeescripts/jTable.coffee
  */
 
@@ -9,6 +9,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
       settings: {
         columns: [],
         identifierAttribute: 'id',
+        singleColumnSearch: false,
         perPage: 25,
         fullPagination: true,
         serverSidePagination: false,
@@ -39,7 +40,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
       options = {};
     }
     return this.each(function() {
-      var buildAll, buildBottomToolbar, buildSearch, buildTable, buildTableHead, buildTopToolbar, changePage, column, fetchItems, generateBaseQuery, i, updateItems, updatePageInfo, updatePagination, updateTableRows, _len, _ref;
+      var buildAll, buildBottomToolbar, buildSearch, buildTable, buildTableFoot, buildTableHead, buildTopToolbar, changePage, column, fetchItems, generateBaseQuery, i, updateItems, updatePageInfo, updatePagination, updateTableRows, _len, _ref;
       buildAll = __bind(function() {
         buildTopToolbar();
         buildTable();
@@ -59,7 +60,8 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         this.query.searchable_columns = searchable_columns;
         this.query.search = "";
         this.query.limit = this.settings.perPage;
-        return this.query.offset = 0;
+        this.query.offset = 0;
+        return this.query.column_search = {};
       }, this);
       fetchItems = __bind(function() {
         var ajax, current_query;
@@ -69,7 +71,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
           ajax = $.ajax({
             url: this.settings.indexUrl,
             data: {
-              query: current_query
+              jTableQuery: current_query
             },
             cache: false,
             success: __bind(function(data, textStatus, XMLHttpRequest) {
@@ -106,9 +108,12 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         return buildSearch();
       }, this);
       buildTable = __bind(function() {
-        this.container.append('<div class="jTable-table-container"><table class="jTable-table"><thead></thead><tbody></tbody></table></div>');
+        this.container.append('<div class="jTable-table-container"><table class="jTable-table"><thead></thead><tbody></tbody><tfoot></tfoot></table></div>');
         this.table = $('table', this.container);
-        return buildTableHead();
+        buildTableHead();
+        if (this.settings.singleColumnSearch) {
+          return buildTableFoot();
+        }
       }, this);
       buildTableHead = __bind(function() {
         var column, table_head, th, _i, _len, _ref;
@@ -154,6 +159,43 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         }
         if (this.settings.editLink || this.settings.destroyLink) {
           return table_head.append($('<th class="jTable-column-heading">&nbsp</th>'));
+        }
+      }, this);
+      buildTableFoot = __bind(function() {
+        var column, search_field, table_foot, th, _i, _len, _ref;
+        console.log("" + (this.container.attr('id')) + ": " + this.settings.singleColumnSearch);
+        if (this.settings.singleColumnSearch) {
+          table_foot = $('tfoot', this.table);
+          _ref = this.settings.columns;
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            column = _ref[_i];
+            if (column.searchable) {
+              th = $('<th class="jTable-column-footer"></th>');
+              search_field = $("<input type='text' jTable-column-attribute='" + column.attribute + "'>");
+              search_field.keyup(__bind(function() {
+                var attribute, current_search, field;
+                field = $(event.currentTarget);
+                attribute = field.attr('jTable-column-attribute');
+                this.query.column_search[attribute] = field.val();
+                current_search = String(this.query.column_search[attribute]);
+                return setTimeout(__bind(function() {
+                  if (current_search === field.val()) {
+                    this.page = 1;
+                    this.query.offset = 0;
+                    return fetchItems();
+                  }
+                }, this), this.settings.ajaxInterval);
+              }, this));
+              th.append(search_field);
+            } else {
+              th = $('<th class="jTable-column-footer">&nbsp;</th>');
+            }
+            console.log(th);
+            table_foot.append(th);
+          }
+          if (this.settings.editLink || this.settings.destroyLink) {
+            return table_foot.append($('<th class="jTable-column-footer">&nbsp;</th>'));
+          }
         }
       }, this);
       updateTableRows = __bind(function() {
@@ -334,7 +376,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
           return updatePagination();
         }
       }, this);
-      this.settings = $.jTable.defaults.settings;
+      this.settings = $.extend(true, {}, $.jTable.defaults.settings);
       this.query = {};
       $.extend(true, this.settings, options);
       _ref = this.settings.columns;
