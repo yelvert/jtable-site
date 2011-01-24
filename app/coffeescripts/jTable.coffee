@@ -288,7 +288,8 @@
       @query = {}
       $.extend true, @settings, options
       for column, i in @settings.columns
-        @settings.columns[i] = $.extend true, {}, $.jTable.defaults.column, column
+        @settings.columns[i] = $.extend(true, {}, $.jTable.defaults.column, column)
+        @settings.columns[i].searchable = false if @settings.columns[i].dataType == 'boolean'
       generateBaseQuery()
       @container = $(this)
       if @settings.width != ''

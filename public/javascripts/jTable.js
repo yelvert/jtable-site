@@ -1,4 +1,4 @@
-/* DO NOT MODIFY. This file was compiled Mon, 24 Jan 2011 13:45:55 GMT from
+/* DO NOT MODIFY. This file was compiled Mon, 24 Jan 2011 16:13:34 GMT from
  * /Users/yelvert/projects/jTable/app/coffeescripts/jTable.coffee
  */
 
@@ -383,6 +383,9 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
       for (i = 0, _len = _ref.length; i < _len; i++) {
         column = _ref[i];
         this.settings.columns[i] = $.extend(true, {}, $.jTable.defaults.column, column);
+        if (this.settings.columns[i].dataType === 'boolean') {
+          this.settings.columns[i].searchable = false;
+        }
       }
       generateBaseQuery();
       this.container = $(this);
