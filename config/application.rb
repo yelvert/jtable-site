@@ -36,9 +36,7 @@ module JTable
     config.action_view.javascript_expansions[:defaults] = %w(rails)
     config.action_view.javascript_expansions[:jTable] = %w(jTable)
     
-    config.action_view.stylesheet_expansions[:defaults] = [
-      "http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.7/themes/cupertino/jquery-ui.css"
-    ]
+    config.action_view.stylesheet_expansions[:defaults] = %w(application)
     config.action_view.stylesheet_expansions[:jTable] = %w(jTable)
 
     # Configure the default encoding used in templates for Ruby 1.9.

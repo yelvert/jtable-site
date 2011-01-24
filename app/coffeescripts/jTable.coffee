@@ -30,6 +30,7 @@
       buildAll = =>
         buildTopToolbar()
         buildTable()
+        buildBottomToolbar()
         fetchItems()
         
       generateBaseQuery = =>
@@ -62,49 +63,49 @@
         changePage(1)
         
       buildTopToolbar = =>
-        toolbar = $('<div class="ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix jTable-top-toolbar"></div>')
+        toolbar = $('<div class="jTable-top-toolbar"></div>')
         @container.append(toolbar)
         buildSearch()
         
       buildTable = =>
-        @container.append('<div class="ui-state-default"><table class="ui-widget"><thead></thead><tbody></tbody></table></div>')
+        @container.append('<div class="jTable-table-container"><table class="jTable-table"><thead></thead><tbody></tbody></table></div>')
         @table = $('table', @element)
         buildTableHead()
         
       buildTableHead = =>
         table_head = $('thead', @table)
         for column in @settings.columns
-          th = $('<th class="ui-state-default jTable-column-heading"></th>')
+          th = $('<th class="jTable-column-heading"></th>')
           th.attr('data-jTable-column-attribute', column.attribute)
-          if column.heading is undefined
+          if column.heading == undefined
             th.html("<div>#{column.attribute}</div>")
           else
             th.html("<div>#{column.heading}</div>")
           if column.sortable
-            $('div',th).append('<span class="css_right ui-icon ui-icon-carat-2-n-s"></span>')
+            $('div',th).append('<span class="jTable-sort jTable-sort-none"></span>')
             th.click =>
-              $('.jTable-column-heading span').removeClass('ui-icon-triangle-1-n ui-icon-triangle-1-s')
-              attribute = column.attribute
+              $('.jTable-column-heading span').removeClass('jTable-sort-asc jTable-sort-desc')
+              attribute = $(event.currentTarget).attr('data-jTable-column-attribute')
               sort_icon = $('span', $(event.currentTarget))
-              if @query.sort_column is attribute
-                if @query.sort_direction is ''
+              if @query.sort_column == attribute
+                if @query.sort_direction == ''
                   @query.sort_direction = 'ASC'
-                  sort.addClass('ui-icon-triangle-1-n')
-                else if @query.sort_direction is 'ASC'
+                  sort.addClass('jTable-sort-asc')
+                else if @query.sort_direction == 'ASC'
                   @query.sort_direction = 'DESC'
-                  sort_icon.addClass('ui-icon-triangle-1-s')
+                  sort_icon.addClass('jTable-sort-desc')
                 else
                   @query.sort_column = ''
                   @query.sort_direction = ''
-                  sort_icon.addClass('ui-icon-carat-2-n-s')
+                  sort_icon.addClass('jTable-sort-none')
               else
                 @query.sort_column = attribute
                 @query.sort_direction = 'ASC'
-                sort_icon.addClass('ui-icon-triangle-1-n')
+                sort_icon.addClass('jTable-sort-asc')
               fetchItems()
           table_head.append($(th))
         if @settings.editLink or @settings.destroyLink
-          table_head.append($('<th class="ui-state-default jTable-column-heading">&nbsp</th>'))
+          table_head.append($('<th class="jTable-column-heading">&nbsp</th>'))
         
       updateTableRows = =>
         table_body = $('tbody', @table)
@@ -121,7 +122,7 @@
             new_cell = $('<td class="jTable-cell"></td>')
             new_cell.addClass(column.columnClass)
             new_cell.attr({'data-jTable-cell-attribute': column.attribute, 'data-jTable-cell-value': item[column.attribute]})
-            if column.dataType is 'boolean'
+            if column.dataType == 'boolean'
               if item[column.attribute]
                 new_cell.html(column.trueValue)
               else
@@ -163,39 +164,53 @@
             if current_search == search_field.val()
               fetchItems()
           @settings.ajaxInterval)
-        search_container = $('<div class="css_left jTable-full-search-container"></div>')
+        search_container = $('<div class="jTable-full-search-container"></div>')
         search_container.html('Search: ')
         search_container.append(search_field)
         $('.jTable-top-toolbar', @container).prepend(search_container)
         
+      buildBottomToolbar = =>
+        toolbar = $('<div class="jTable-bottom-toolbar"><div class="jTable-page-info"></div><div class="jTable-pagination-container"></div></div>')
+        @container.append(toolbar)
+        updatePageInfo()
+        updatePagination()
+        
+      updatePageInfo = =>
+        page_info = $('.jTable-page-info')
+        start_items = ((@page-1)*@settings.perPage)+1
+        end_items = start_items+@settings.perPage-1
+        total_items = @items.length
+        page_info.html("Displaying #{start_items} to #{end_items} of #{total_items} items.")
+        
       updatePagination = =>
-        $('div.pagination-container', @container).remove()
-        page_div = $('<div class="pagination-container"></div>')
+        page_div = $('.jTable-pagination-container')
+        page_div.html('')
+        generatePaginationButton = (page_number) =>
+          $("<span class='jTable-button jTable-pagination-button' data-jTable-pagination-page='#{page_number}'>#{page_number}</span>").click (event) =>
+            changePage(parseInt($(event.target).attr('data-jTable-pagination-page'), 10))
+          
         unless (@page-1)*@settings.perPage <= 0
-          prev_page_link = $("<a href='#'>Prev</a>")
+          prev_page_link = $("<span class='jTable-button jTable-pagination-button'>Prev</span>")
           prev_page_link.click (event) =>
             changePage(@page-1)
           page_div.append(prev_page_link)
         if @settings.fullPagination
           if Math.ceil(@items.length/@settings.perPage) == 0
-            page_link = $("<a data-jTable-pagination-page='#{i}' href='#'>#{i}</a>")
-            page_link.click (event) =>
-              page = parseInt($(event.target).attr('data-jTable-pagination-page'), 10)
-              changePage(page)
+            page_link = generatePaginationButton(1)
             page_div.append(page_link)
           else
-            for i in [1..Math.ceil(@items.length/@settings.perPage)]
-              page_link = $("<a data-jTable-pagination-page='#{i}' href='#'>#{i}</a>")
-              page_link.click (event) =>
-                page = parseInt($(event.target).attr('data-jTable-pagination-page'), 10)
-                changePage(page)
+            number_of_pages = Math.ceil(@items.length/@settings.perPage)
+            start_page = if @page-2 < 1 then 1 else @page-2
+            end_page = if @page+2 > number_of_pages then number_of_pages else @page+2
+            for i in [start_page..end_page]
+              page_link = generatePaginationButton(i)
               page_div.append(page_link)
         unless @items.length <= @page*@settings.perPage
-          next_page_link = $("<a href='#'>Next</a>")
+          next_page_link = $("<span class='jTable-button jTable-pagination-button'>Next</span>")
           next_page_link.click (event) =>
             changePage(@page+1)
           page_div.append(next_page_link)
-        @container.append(page_div)
+        $(".jTable-pagination-button[data-jTable-pagination-page=#{@page}]").addClass('jTable-pagination-current-page')
         
       changePage = (new_page) =>
         @page = new_page
@@ -204,6 +219,7 @@
         while (i < @page*@settings.perPage)
           $("tr[data-jTable-row-index='#{i}']",@table).show()
           i++
+        updatePageInfo()
         updatePagination()
         
         
@@ -216,7 +232,7 @@
       @container = $(this)
       if @settings.width != ''
         @container.css({width: @settings.width})
-      @container.addClass('ui-widget jTable-container')
+      @container.addClass('jTable-container')
       @items = []
       @container.data('jTable', {})
       @container.data('jTable').settings = @settings

@@ -9,11 +9,11 @@
     editUrl: "/widgets/:identifier/edit",
     destroyUrl: "/widgets/:identifier.js",
     columns: [
-      {heading: 'ID', attribute: 'id'},
-      {heading: 'Name', attribute: 'name'},
-      {heading: 'Content', attribute: 'content', columnClass: 'center'},
-      {heading: 'Test 1', attribute: 'test_1', dataType: 'boolean', trueValue: 'Yes', falseValue: 'No'},
-      {attribute: 'test_2', searchable: false, sortable: false}
+      {heading: 'ID', attribute: 'id', columnClass: 'center'},
+      {heading: 'Name', attribute: 'name', columnClass: 'left'},
+      {heading: 'Content', attribute: 'content', columnClass: 'left'},
+      {heading: 'Test 1', attribute: 'test_1', columnClass: 'center', dataType: 'boolean', trueValue: 'Yes', falseValue: 'No'},
+      {attribute: 'test_2', searchable: false, sortable: false, columnClass: 'right'}
     ]
   })
 </script>

@@ -1,21 +1,57 @@
+/* Colors
+light-blue:   rgb(174,208,234)
+mid-blue:     rgb(222,237,247)
+dark-blue:    rgb(39,121,170)
+*/
+
+
 .jTable-container {
   width: 100%;
 }
 
-.jTable-container table {
+.jTable-container a {
+  color: rgb(39,121,170);
+  text-decoration: none;
+}
+
+.jTable-top-toolbar {
+  padding: 5px;
+  -moz-border-radius-topright: 6px;
+  -webkit-border-top-right-radius: 6px;
+  border-top-right-radius: 6px;
+  -moz-border-radius-topleft: 6px;
+  -webkit-border-top-left-radius: 6px;
+  border-top-left-radius: 6px;
+  border: 1px solid rgb(39,121,170);
+  border-bottom: none;
+  background-color: rgb(222,237,247);
+  height: 23px;
+}
+
+.jTable-full-search-container {
+  float: left;
+  width: 50%;
+}
+
+.jTable-table-container {
+  border: 1px solid rgb(39,121,170);
+  background-color: rgb(222,237,247);
+}
+
+.jTable-table {
   border-spacing: 0;
   border-padding: 0;
   width: 100%;
 }
 
-.jTable-container table td {
-  font-size: 1em;
-  color: black;
-  font-weight: normal;
+.jTable-column-heading {
+  border-left: 1px solid rgb(39,121,170);
+  border-bottom: 1px solid rgb(39,121,170);
+  color: rgb(39,121,170);
 }
 
-.jTable-column-heading {
-  
+.jTable-column-heading:first-child {
+  border-left: none;
 }
 
 .jTable-column-heading div {
@@ -30,31 +66,106 @@
   right: 0;
 }
 
+.jTable-column-heading div span.jTable-sort {
+  width: 16px;
+  height: 16px;
+  background-image: url(/images/jTable-icons.png);
+  display: block;
+  text-indent: -99999px;
+  overflow: hidden;
+  background-repeat: no-repeat;
+  float: right;
+}
+
+.jTable-column-heading div span.jTable-sort-none {
+  background-position: -128px 0;
+}
+
+.jTable-column-heading div span.jTable-sort-asc {
+  background-position: 0 -16px;
+}
+
+.jTable-column-heading div span.jTable-sort-desc {
+  background-position: -64px -16px;
+}
+
 .jTable-row-odd {
-  background-color: #AED0EA;
+  background-color: rgb(222,237,247);
 }
 
 .jTable-row-even {
-  background-color: #D7EBF9;
+  background-color: rgb(174,208,234);
+}
+
+.jTable-table td {
+  padding: 1px 3px;
 }
 
 .jTable-actions-cell {
-  
+  text-align: center;
 }
 
 .jTable-actions-cell a {
   padding: 0 5px;
 }
 
+.jTable-bottom-toolbar {
+  padding: 5px;
+  -moz-border-radius-bottomright: 6px;
+  -webkit-border-bottom-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+  -moz-border-radius-bottomleft: 6px;
+  -webkit-border-bottom-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+  border: 1px solid rgb(39,121,170);
+  border-top: none;
+  background-color: rgb(222,237,247);
+  height: 23px;
+}
+
+.jTable-page-info {
+  margin-top: 2px;
+  float: left;
+  font-size: .8em;
+}
+
+.jTable-pagination-container {
+  margin-top: 2px;
+  float: right;
+}
+
+.jTable-pagination-container span.jTable-pagination-button {
+  
+}
+
+.jTable-pagination-container span.jTable-pagination-button:hover {
+  background-color: rgb(174,208,234);
+}
+
+.jTable-pagination-container .jTable-pagination-current-page {
+  background-color: rgb(174,208,234);
+}
+
+.jTable-button {
+  color: rgb(39,121,170);
+  padding: 1px 3px;
+  margin: 0 2px;
+  cursor: pointer;
+  -moz-border-radius: 6px;
+  -webkit-border-radius: 6px;
+  border-radius: 6px;
+  border: 1px solid rgb(39,121,170);
+  background-color: rgb(222,237,247);
+}
+
+.left {
+  text-align: left;
+}
+
 .center {
   text-align: center;
 }
 
-.ui-toolbar {
-  padding: 5px;
-}
-
-.ui-state-default a, .ui-state-default a:link, .ui-state-default a:visited {
-  color: black;
-  text-decoration: none;
+.right {
+  text-align: right;
 }

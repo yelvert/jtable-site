@@ -1,4 +1,4 @@
-/* DO NOT MODIFY. This file was compiled Sun, 23 Jan 2011 10:48:30 GMT from
+/* DO NOT MODIFY. This file was compiled Mon, 24 Jan 2011 09:17:21 GMT from
  * /Users/yelvert/projects/jTable/app/coffeescripts/jTable.coffee
  */
 
@@ -38,10 +38,11 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
       options = {};
     }
     return this.each(function() {
-      var buildAll, buildSearch, buildTable, buildTableHead, buildTopToolbar, changePage, column, fetchItems, generateBaseQuery, i, updateItems, updatePagination, updateTableRows, _len, _ref;
+      var buildAll, buildBottomToolbar, buildSearch, buildTable, buildTableHead, buildTopToolbar, changePage, column, fetchItems, generateBaseQuery, i, updateItems, updatePageInfo, updatePagination, updateTableRows, _len, _ref;
       buildAll = __bind(function() {
         buildTopToolbar();
         buildTable();
+        buildBottomToolbar();
         return fetchItems();
       }, this);
       generateBaseQuery = __bind(function() {
@@ -88,12 +89,12 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
       }, this);
       buildTopToolbar = __bind(function() {
         var toolbar;
-        toolbar = $('<div class="ui-toolbar ui-widget-header ui-corner-tl ui-corner-tr ui-helper-clearfix jTable-top-toolbar"></div>');
+        toolbar = $('<div class="jTable-top-toolbar"></div>');
         this.container.append(toolbar);
         return buildSearch();
       }, this);
       buildTable = __bind(function() {
-        this.container.append('<div class="ui-state-default"><table class="ui-widget"><thead></thead><tbody></tbody></table></div>');
+        this.container.append('<div class="jTable-table-container"><table class="jTable-table"><thead></thead><tbody></tbody></table></div>');
         this.table = $('table', this.element);
         return buildTableHead();
       }, this);
@@ -103,7 +104,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         _ref = this.settings.columns;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           column = _ref[_i];
-          th = $('<th class="ui-state-default jTable-column-heading"></th>');
+          th = $('<th class="jTable-column-heading"></th>');
           th.attr('data-jTable-column-attribute', column.attribute);
           if (column.heading === void 0) {
             th.html("<div>" + column.attribute + "</div>");
@@ -111,28 +112,28 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
             th.html("<div>" + column.heading + "</div>");
           }
           if (column.sortable) {
-            $('div', th).append('<span class="css_right ui-icon ui-icon-carat-2-n-s"></span>');
+            $('div', th).append('<span class="jTable-sort jTable-sort-none"></span>');
             th.click(__bind(function() {
               var attribute, sort_icon;
-              $('.jTable-column-heading span').removeClass('ui-icon-triangle-1-n ui-icon-triangle-1-s');
-              attribute = column.attribute;
+              $('.jTable-column-heading span').removeClass('jTable-sort-asc jTable-sort-desc');
+              attribute = $(event.currentTarget).attr('data-jTable-column-attribute');
               sort_icon = $('span', $(event.currentTarget));
               if (this.query.sort_column === attribute) {
                 if (this.query.sort_direction === '') {
                   this.query.sort_direction = 'ASC';
-                  sort.addClass('ui-icon-triangle-1-n');
+                  sort.addClass('jTable-sort-asc');
                 } else if (this.query.sort_direction === 'ASC') {
                   this.query.sort_direction = 'DESC';
-                  sort_icon.addClass('ui-icon-triangle-1-s');
+                  sort_icon.addClass('jTable-sort-desc');
                 } else {
                   this.query.sort_column = '';
                   this.query.sort_direction = '';
-                  sort_icon.addClass('ui-icon-carat-2-n-s');
+                  sort_icon.addClass('jTable-sort-none');
                 }
               } else {
                 this.query.sort_column = attribute;
                 this.query.sort_direction = 'ASC';
-                sort_icon.addClass('ui-icon-triangle-1-n');
+                sort_icon.addClass('jTable-sort-asc');
               }
               return fetchItems();
             }, this));
@@ -140,7 +141,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
           table_head.append($(th));
         }
         if (this.settings.editLink || this.settings.destroyLink) {
-          return table_head.append($('<th class="ui-state-default jTable-column-heading">&nbsp</th>'));
+          return table_head.append($('<th class="jTable-column-heading">&nbsp</th>'));
         }
       }, this);
       updateTableRows = __bind(function() {
@@ -227,17 +228,37 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
             }
           }, this), this.settings.ajaxInterval);
         }, this));
-        search_container = $('<div class="css_left jTable-full-search-container"></div>');
+        search_container = $('<div class="jTable-full-search-container"></div>');
         search_container.html('Search: ');
         search_container.append(search_field);
         return $('.jTable-top-toolbar', this.container).prepend(search_container);
       }, this);
+      buildBottomToolbar = __bind(function() {
+        var toolbar;
+        toolbar = $('<div class="jTable-bottom-toolbar"><div class="jTable-page-info"></div><div class="jTable-pagination-container"></div></div>');
+        this.container.append(toolbar);
+        updatePageInfo();
+        return updatePagination();
+      }, this);
+      updatePageInfo = __bind(function() {
+        var end_items, page_info, start_items, total_items;
+        page_info = $('.jTable-page-info');
+        start_items = ((this.page - 1) * this.settings.perPage) + 1;
+        end_items = start_items + this.settings.perPage - 1;
+        total_items = this.items.length;
+        return page_info.html("Displaying " + start_items + " to " + end_items + " of " + total_items + " items.");
+      }, this);
       updatePagination = __bind(function() {
-        var i, next_page_link, page_div, page_link, prev_page_link, _ref;
-        $('div.pagination-container', this.container).remove();
-        page_div = $('<div class="pagination-container"></div>');
+        var end_page, generatePaginationButton, i, next_page_link, number_of_pages, page_div, page_link, prev_page_link, start_page;
+        page_div = $('.jTable-pagination-container');
+        page_div.html('');
+        generatePaginationButton = __bind(function(page_number) {
+          return $("<span class='jTable-button jTable-pagination-button' data-jTable-pagination-page='" + page_number + "'>" + page_number + "</span>").click(__bind(function(event) {
+            return changePage(parseInt($(event.target).attr('data-jTable-pagination-page'), 10));
+          }, this));
+        }, this);
         if (!((this.page - 1) * this.settings.perPage <= 0)) {
-          prev_page_link = $("<a href='#'>Prev</a>");
+          prev_page_link = $("<span class='jTable-button jTable-pagination-button'>Prev</span>");
           prev_page_link.click(__bind(function(event) {
             return changePage(this.page - 1);
           }, this));
@@ -245,33 +266,26 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         }
         if (this.settings.fullPagination) {
           if (Math.ceil(this.items.length / this.settings.perPage) === 0) {
-            page_link = $("<a data-jTable-pagination-page='" + i + "' href='#'>" + i + "</a>");
-            page_link.click(__bind(function(event) {
-              var page;
-              page = parseInt($(event.target).attr('data-jTable-pagination-page'), 10);
-              return changePage(page);
-            }, this));
+            page_link = generatePaginationButton(1);
             page_div.append(page_link);
           } else {
-            for (i = 1, _ref = Math.ceil(this.items.length / this.settings.perPage); (1 <= _ref ? i <= _ref : i >= _ref); (1 <= _ref ? i += 1 : i -= 1)) {
-              page_link = $("<a data-jTable-pagination-page='" + i + "' href='#'>" + i + "</a>");
-              page_link.click(__bind(function(event) {
-                var page;
-                page = parseInt($(event.target).attr('data-jTable-pagination-page'), 10);
-                return changePage(page);
-              }, this));
+            number_of_pages = Math.ceil(this.items.length / this.settings.perPage);
+            start_page = this.page - 2 < 1 ? 1 : this.page - 2;
+            end_page = this.page + 2 > number_of_pages ? number_of_pages : this.page + 2;
+            for (i = start_page; (start_page <= end_page ? i <= end_page : i >= end_page); (start_page <= end_page ? i += 1 : i -= 1)) {
+              page_link = generatePaginationButton(i);
               page_div.append(page_link);
             }
           }
         }
         if (!(this.items.length <= this.page * this.settings.perPage)) {
-          next_page_link = $("<a href='#'>Next</a>");
+          next_page_link = $("<span class='jTable-button jTable-pagination-button'>Next</span>");
           next_page_link.click(__bind(function(event) {
             return changePage(this.page + 1);
           }, this));
           page_div.append(next_page_link);
         }
-        return this.container.append(page_div);
+        return $(".jTable-pagination-button[data-jTable-pagination-page=" + this.page + "]").addClass('jTable-pagination-current-page');
       }, this);
       changePage = __bind(function(new_page) {
         var i;
@@ -282,6 +296,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
           $("tr[data-jTable-row-index='" + i + "']", this.table).show();
           i++;
         }
+        updatePageInfo();
         return updatePagination();
       }, this);
       this.settings = $.jTable.defaults.settings;
@@ -299,7 +314,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
           width: this.settings.width
         });
       }
-      this.container.addClass('ui-widget jTable-container');
+      this.container.addClass('jTable-container');
       this.items = [];
       this.container.data('jTable', {});
       this.container.data('jTable').settings = this.settings;
