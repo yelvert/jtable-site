@@ -1,4 +1,4 @@
-/* DO NOT MODIFY. This file was compiled Mon, 24 Jan 2011 09:17:21 GMT from
+/* DO NOT MODIFY. This file was compiled Mon, 24 Jan 2011 12:30:45 GMT from
  * /Users/yelvert/projects/jTable/app/coffeescripts/jTable.coffee
  */
 
@@ -11,6 +11,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         identifierAttribute: 'id',
         perPage: 25,
         fullPagination: true,
+        serverSidePagination: false,
         ajaxInterval: 250,
         rowClass: '',
         width: '',
@@ -56,12 +57,15 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
           }
         }
         this.query.searchable_columns = searchable_columns;
-        return this.query.search = "";
+        this.query.search = "";
+        this.query.limit = this.settings.perPage;
+        return this.query.offset = 0;
       }, this);
       fetchItems = __bind(function() {
         var ajax, current_query;
         if (this.query !== this.previous_query || this.query.search === "") {
           current_query = $.extend(true, {}, this.query);
+          this.stale_paging = false;
           ajax = $.ajax({
             url: this.settings.indexUrl,
             data: {
@@ -69,14 +73,23 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
             },
             cache: false,
             success: __bind(function(data, textStatus, XMLHttpRequest) {
-              return updateItems(data);
+              updateItems(data);
+              return this.initial_load = false;
             }, this)
           });
           return this.previous_query = $.extend(true, {}, current_query);
         }
       }, this);
-      updateItems = __bind(function(items) {
-        var item, _i, _len;
+      updateItems = __bind(function(data) {
+        var item, items, _i, _len;
+        if (this.settings.serverSidePagination) {
+          this.items_count = data.total_items;
+          items = data.items;
+        } else {
+          this.items_count = data.length;
+          items = data;
+          this.page = 1;
+        }
         this.items = [];
         for (_i = 0, _len = items.length; _i < _len; _i++) {
           item = items[_i];
@@ -84,8 +97,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         }
         this.container.data('jTable').items = this.items;
         updateTableRows();
-        this.page = 1;
-        return changePage(1);
+        return changePage(this.page);
       }, this);
       buildTopToolbar = __bind(function() {
         var toolbar;
@@ -224,6 +236,8 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
           current_search = String(this.query.search);
           return setTimeout(__bind(function() {
             if (current_search === search_field.val()) {
+              this.page = 1;
+              this.query.offset = 0;
               return fetchItems();
             }
           }, this), this.settings.ajaxInterval);
@@ -245,7 +259,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         page_info = $('.jTable-page-info');
         start_items = ((this.page - 1) * this.settings.perPage) + 1;
         end_items = start_items + this.settings.perPage - 1;
-        total_items = this.items.length;
+        total_items = this.items_count;
         return page_info.html("Displaying " + start_items + " to " + end_items + " of " + total_items + " items.");
       }, this);
       updatePagination = __bind(function() {
@@ -254,22 +268,24 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         page_div.html('');
         generatePaginationButton = __bind(function(page_number) {
           return $("<span class='jTable-button jTable-pagination-button' data-jTable-pagination-page='" + page_number + "'>" + page_number + "</span>").click(__bind(function(event) {
-            return changePage(parseInt($(event.target).attr('data-jTable-pagination-page'), 10));
+            this.stale_paging = true;
+            return changePage(parseInt($(event.currentTarget).attr('data-jTable-pagination-page'), 10));
           }, this));
         }, this);
         if (!((this.page - 1) * this.settings.perPage <= 0)) {
           prev_page_link = $("<span class='jTable-button jTable-pagination-button'>Prev</span>");
           prev_page_link.click(__bind(function(event) {
+            this.stale_paging = true;
             return changePage(this.page - 1);
           }, this));
           page_div.append(prev_page_link);
         }
         if (this.settings.fullPagination) {
-          if (Math.ceil(this.items.length / this.settings.perPage) === 0) {
+          if (Math.ceil(this.items_count / this.settings.perPage) === 0) {
             page_link = generatePaginationButton(1);
             page_div.append(page_link);
           } else {
-            number_of_pages = Math.ceil(this.items.length / this.settings.perPage);
+            number_of_pages = Math.ceil(this.items_count / this.settings.perPage);
             start_page = this.page - 2 < 1 ? 1 : this.page - 2;
             end_page = this.page + 2 > number_of_pages ? number_of_pages : this.page + 2;
             for (i = start_page; (start_page <= end_page ? i <= end_page : i >= end_page); (start_page <= end_page ? i += 1 : i -= 1)) {
@@ -278,9 +294,10 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
             }
           }
         }
-        if (!(this.items.length <= this.page * this.settings.perPage)) {
+        if (!(this.items_count <= this.page * this.settings.perPage)) {
           next_page_link = $("<span class='jTable-button jTable-pagination-button'>Next</span>");
           next_page_link.click(__bind(function(event) {
+            this.stale_paging = true;
             return changePage(this.page + 1);
           }, this));
           page_div.append(next_page_link);
@@ -289,15 +306,33 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
       }, this);
       changePage = __bind(function(new_page) {
         var i;
-        this.page = new_page;
-        $('tr[data-jTable-row-index]', this.table).hide();
-        i = (this.page - 1) * this.settings.perPage;
-        while (i < this.page * this.settings.perPage) {
-          $("tr[data-jTable-row-index='" + i + "']", this.table).show();
-          i++;
+        if (this.settings.serverSidePagination) {
+          if (this.initial_load) {
+            this.page = new_page;
+            updatePageInfo();
+            return updatePagination();
+          } else {
+            if (this.stale_paging) {
+              this.query.offset = (new_page - 1) * this.settings.perPage;
+              this.page = new_page;
+              return fetchItems();
+            } else {
+              this.page = new_page;
+              updatePageInfo();
+              return updatePagination();
+            }
+          }
+        } else {
+          this.page = new_page;
+          $('tr[data-jTable-row-index]', this.table).hide();
+          i = (this.page - 1) * this.settings.perPage;
+          while (i < this.page * this.settings.perPage) {
+            $("tr[data-jTable-row-index='" + i + "']", this.table).show();
+            i++;
+          }
+          updatePageInfo();
+          return updatePagination();
         }
-        updatePageInfo();
-        return updatePagination();
       }, this);
       this.settings = $.jTable.defaults.settings;
       this.query = {};
@@ -315,6 +350,8 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         });
       }
       this.container.addClass('jTable-container');
+      this.initial_load = true;
+      this.stale_paging = false;
       this.items = [];
       this.container.data('jTable', {});
       this.container.data('jTable').settings = this.settings;

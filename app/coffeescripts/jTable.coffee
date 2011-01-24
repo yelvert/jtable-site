@@ -6,6 +6,7 @@
         identifierAttribute: 'id'
         perPage: 25
         fullPagination: true
+        serverSidePagination: false
         ajaxInterval: 250
         rowClass: ''
         width: ''
@@ -40,27 +41,37 @@
             searchable_columns.push(column.attribute)
         @query.searchable_columns = searchable_columns
         @query.search = ""
+        @query.limit = @settings.perPage
+        @query.offset = 0
         
       fetchItems = =>
         if @query != @previous_query or @query.search == ""
           current_query = $.extend(true, {}, @query)
+          @stale_paging = false
           ajax = $.ajax({
             url: @settings.indexUrl
             data: {query: current_query}
             cache: false
             success: (data, textStatus, XMLHttpRequest) =>
               updateItems(data)
+              @initial_load = false
           })
           @previous_query = $.extend(true, {}, current_query)
         
-      updateItems = (items) =>
+      updateItems = (data) =>
+        if @settings.serverSidePagination
+          @items_count = data.total_items
+          items = data.items
+        else
+          @items_count = data.length
+          items = data
+          @page = 1
         @items = []
         for item in items
           @items.push item
         @container.data('jTable').items = @items
         updateTableRows()
-        @page = 1
-        changePage(1)
+        changePage(@page)
         
       buildTopToolbar = =>
         toolbar = $('<div class="jTable-top-toolbar"></div>')
@@ -162,6 +173,8 @@
           current_search = String(@query.search)
           setTimeout(=>
             if current_search == search_field.val()
+              @page = 1
+              @query.offset = 0
               fetchItems()
           @settings.ajaxInterval)
         search_container = $('<div class="jTable-full-search-container"></div>')
@@ -179,7 +192,7 @@
         page_info = $('.jTable-page-info')
         start_items = ((@page-1)*@settings.perPage)+1
         end_items = start_items+@settings.perPage-1
-        total_items = @items.length
+        total_items = @items_count
         page_info.html("Displaying #{start_items} to #{end_items} of #{total_items} items.")
         
       updatePagination = =>
@@ -187,40 +200,58 @@
         page_div.html('')
         generatePaginationButton = (page_number) =>
           $("<span class='jTable-button jTable-pagination-button' data-jTable-pagination-page='#{page_number}'>#{page_number}</span>").click (event) =>
-            changePage(parseInt($(event.target).attr('data-jTable-pagination-page'), 10))
+            @stale_paging = true
+            changePage(parseInt($(event.currentTarget).attr('data-jTable-pagination-page'), 10))
           
         unless (@page-1)*@settings.perPage <= 0
           prev_page_link = $("<span class='jTable-button jTable-pagination-button'>Prev</span>")
           prev_page_link.click (event) =>
+            @stale_paging = true
             changePage(@page-1)
           page_div.append(prev_page_link)
         if @settings.fullPagination
-          if Math.ceil(@items.length/@settings.perPage) == 0
+          if Math.ceil(@items_count/@settings.perPage) == 0
             page_link = generatePaginationButton(1)
             page_div.append(page_link)
           else
-            number_of_pages = Math.ceil(@items.length/@settings.perPage)
+            number_of_pages = Math.ceil(@items_count/@settings.perPage)
             start_page = if @page-2 < 1 then 1 else @page-2
             end_page = if @page+2 > number_of_pages then number_of_pages else @page+2
             for i in [start_page..end_page]
               page_link = generatePaginationButton(i)
               page_div.append(page_link)
-        unless @items.length <= @page*@settings.perPage
+        unless @items_count <= @page*@settings.perPage
           next_page_link = $("<span class='jTable-button jTable-pagination-button'>Next</span>")
           next_page_link.click (event) =>
+            @stale_paging = true
             changePage(@page+1)
           page_div.append(next_page_link)
         $(".jTable-pagination-button[data-jTable-pagination-page=#{@page}]").addClass('jTable-pagination-current-page')
         
       changePage = (new_page) =>
-        @page = new_page
-        $('tr[data-jTable-row-index]',@table).hide()
-        i = (@page-1)*@settings.perPage
-        while (i < @page*@settings.perPage)
-          $("tr[data-jTable-row-index='#{i}']",@table).show()
-          i++
-        updatePageInfo()
-        updatePagination()
+        if @settings.serverSidePagination
+          if @initial_load
+            @page = new_page
+            updatePageInfo()
+            updatePagination()
+          else
+            if @stale_paging
+              @query.offset = ((new_page-1)*@settings.perPage)
+              @page = new_page
+              fetchItems()
+            else
+              @page = new_page
+              updatePageInfo()
+              updatePagination()
+        else
+          @page = new_page
+          $('tr[data-jTable-row-index]',@table).hide()
+          i = (@page-1)*@settings.perPage
+          while (i < @page*@settings.perPage)
+            $("tr[data-jTable-row-index='#{i}']",@table).show()
+            i++
+          updatePageInfo()
+          updatePagination()
         
         
       @settings = $.jTable.defaults.settings
@@ -233,6 +264,8 @@
       if @settings.width != ''
         @container.css({width: @settings.width})
       @container.addClass('jTable-container')
+      @initial_load = true
+      @stale_paging = false
       @items = []
       @container.data('jTable', {})
       @container.data('jTable').settings = @settings

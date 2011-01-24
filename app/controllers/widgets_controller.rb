@@ -2,10 +2,12 @@ class WidgetsController < ApplicationController
   # GET /widgets
   # GET /widgets.xml
   def index
-    @widgets = Widget.from_query(params[:query]).all
+    @widgets = Widget.from_query(params[:query])
 
     respond_to do |format|
-      format.html # index.html.erb
+      format.html do
+        #@widgets = Widget.all
+      end
       format.json { render :json => @widgets }
       format.xml  { render :xml => @widgets }
     end

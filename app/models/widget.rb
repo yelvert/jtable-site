@@ -12,7 +12,14 @@ class Widget < ActiveRecord::Base
       unless query[:sort_column].blank? and query[:sort_direction].blank?
         widgets = widgets.order("#{query[:sort_column]} #{query[:sort_direction]}")
       end
+      total_items = widgets.count
+      if query[:limit]
+        widgets = widgets.limit(query[:limit])
+      end
+      if query[:offset]
+        widgets = widgets.offset(query[:offset])
+      end
     end
-    widgets
+    {:total_items => total_items, :items => widgets}
   end
 end
