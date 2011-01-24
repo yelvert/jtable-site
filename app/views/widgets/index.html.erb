@@ -4,7 +4,7 @@
 <div id="widgets1"></div>
 <script type="text/javascript" charset="utf-8">
   $("#widgets1").jTable({
-    width: '700px',
+    width: '100%',
     serverSidePagination: true,
     singleColumnSearch: true,
     indexUrl: "/widgets/server_side.json",
@@ -15,7 +15,11 @@
       {heading: 'Name', attribute: 'name', columnClass: 'left'},
       {heading: 'Content', attribute: 'content', columnClass: 'left'},
       {heading: 'Test 1', attribute: 'test_1', columnClass: 'center', dataType: 'boolean', trueValue: 'Yes', falseValue: 'No'},
-      {attribute: 'test_2', searchable: false, sortable: false, columnClass: 'right'}
+      {attribute: 'test_2', searchable: false, sortable: false, columnClass: 'right'},
+      {heading: 'Column 1', attribute: 'column_1', sortable: false},
+      {heading: 'Column 2', attribute: 'column_2'},
+      {heading: 'Column 3', attribute: 'column_3'},
+      {heading: 'Column 4', attribute: 'column_4', sortable: false}
     ]
   })
 </script>
@@ -25,7 +29,7 @@
 <div id="widgets2"></div>
 <script type="text/javascript" charset="utf-8">
   $("#widgets2").jTable({
-    width: '800px',
+    width: '100%',
     indexUrl: "/widgets.json",
     editUrl: "/widgets/:identifier/edit",
     destroyUrl: "/widgets/:identifier.js",
@@ -34,7 +38,11 @@
       {heading: 'Name', attribute: 'name', columnClass: 'left'},
       {heading: 'Content', attribute: 'content', columnClass: 'left'},
       {heading: 'Test 1', attribute: 'test_1', columnClass: 'center', dataType: 'boolean'},
-      {attribute: 'test_2', searchable: false, sortable: false, columnClass: 'right'}
+      {attribute: 'test_2', searchable: false, sortable: false, columnClass: 'right'},
+      {heading: 'Column 1', attribute: 'column_1', sortable: false},
+      {heading: 'Column 2', attribute: 'column_2'},
+      {heading: 'Column 3', attribute: 'column_3'},
+      {heading: 'Column 4', attribute: 'column_4', sortable: false}
     ]
   })
 </script>
