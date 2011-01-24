@@ -4,16 +4,21 @@ class Widget < ActiveRecord::Base
     unless query.nil?
       unless query[:search].blank?
         where_query = []
+        search_terms = query[:search].split(" ")
         query[:searchable_columns].each do |column|
-          where_query << widgets.arel_table[column.to_sym].matches("%#{query[:search]}%")
+          search_terms.each do |term|
+            where_query << widgets.arel_table[column.to_sym].matches("%#{term}%")
+          end
         end
         widgets = widgets.where(where_query.inject(&:or))
       end
       unless query[:column_search].blank?
         query[:column_search].each_pair do |column,search|
-          unless search.blank?
-            widgets = widgets.where(widgets.arel_table[column.to_sym].matches("%#{search}%"))
+          where_query = []
+          search.split(" ").each do |term|
+            where_query << widgets.arel_table[column.to_sym].matches("%#{term}%")
           end
+          widgets = widgets.where(where_query.inject(&:or))
         end
       end
       unless query[:sort_column].blank? and query[:sort_direction].blank?
