@@ -10,9 +10,10 @@ class Widget < ActiveRecord::Base
         widgets = widgets.where(where_query.inject(&:or))
       end
       unless query[:column_search].blank?
-        logger.info query[:column_search]
         query[:column_search].each_pair do |column,search|
-          widgets = widgets.where(widgets.arel_table[column.to_sym].matches("%#{search}%"))
+          unless search.blank?
+            widgets = widgets.where(widgets.arel_table[column.to_sym].matches("%#{search}%"))
+          end
         end
       end
       unless query[:sort_column].blank? and query[:sort_direction].blank?
