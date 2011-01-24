@@ -1,4 +1,4 @@
-/* DO NOT MODIFY. This file was compiled Mon, 24 Jan 2011 12:30:45 GMT from
+/* DO NOT MODIFY. This file was compiled Mon, 24 Jan 2011 12:37:52 GMT from
  * /Users/yelvert/projects/jTable/app/coffeescripts/jTable.coffee
  */
 
@@ -107,7 +107,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
       }, this);
       buildTable = __bind(function() {
         this.container.append('<div class="jTable-table-container"><table class="jTable-table"><thead></thead><tbody></tbody></table></div>');
-        this.table = $('table', this.element);
+        this.table = $('table', this.container);
         return buildTableHead();
       }, this);
       buildTableHead = __bind(function() {
@@ -127,7 +127,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
             $('div', th).append('<span class="jTable-sort jTable-sort-none"></span>');
             th.click(__bind(function() {
               var attribute, sort_icon;
-              $('.jTable-column-heading span').removeClass('jTable-sort-asc jTable-sort-desc');
+              $('.jTable-column-heading span', this.container).removeClass('jTable-sort-asc jTable-sort-desc');
               attribute = $(event.currentTarget).attr('data-jTable-column-attribute');
               sort_icon = $('span', $(event.currentTarget));
               if (this.query.sort_column === attribute) {
@@ -204,7 +204,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
               destroy_link.attr('data-jTable-destroy-url', this.settings.destroyUrl.replace(/\:identifier/, item[this.settings.identifierAttribute]));
               destroy_link.click(__bind(function(event) {
                 $.ajax({
-                  url: $(event.target).attr('data-jTable-destroy-url'),
+                  url: $(event.currentTarget).attr('data-jTable-destroy-url'),
                   type: 'POST',
                   data: {
                     '_method': 'DELETE'
@@ -228,7 +228,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
       }, this);
       buildSearch = __bind(function() {
         var search_container, search_field;
-        $('.jTable-full-search-container.').remove();
+        $('.jTable-full-search-container.', this.container).remove();
         search_field = $('<input type="text" />');
         search_field.keyup(__bind(function() {
           var current_search;
@@ -256,7 +256,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
       }, this);
       updatePageInfo = __bind(function() {
         var end_items, page_info, start_items, total_items;
-        page_info = $('.jTable-page-info');
+        page_info = $('.jTable-page-info', this.container);
         start_items = ((this.page - 1) * this.settings.perPage) + 1;
         end_items = start_items + this.settings.perPage - 1;
         total_items = this.items_count;
@@ -264,7 +264,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
       }, this);
       updatePagination = __bind(function() {
         var end_page, generatePaginationButton, i, next_page_link, number_of_pages, page_div, page_link, prev_page_link, start_page;
-        page_div = $('.jTable-pagination-container');
+        page_div = $('.jTable-pagination-container', this.container);
         page_div.html('');
         generatePaginationButton = __bind(function(page_number) {
           return $("<span class='jTable-button jTable-pagination-button' data-jTable-pagination-page='" + page_number + "'>" + page_number + "</span>").click(__bind(function(event) {
@@ -302,7 +302,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
           }, this));
           page_div.append(next_page_link);
         }
-        return $(".jTable-pagination-button[data-jTable-pagination-page=" + this.page + "]").addClass('jTable-pagination-current-page');
+        return $(".jTable-pagination-button[data-jTable-pagination-page=" + this.page + "]", this.container).addClass('jTable-pagination-current-page');
       }, this);
       changePage = __bind(function(new_page) {
         var i;

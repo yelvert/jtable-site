@@ -80,7 +80,7 @@
         
       buildTable = =>
         @container.append('<div class="jTable-table-container"><table class="jTable-table"><thead></thead><tbody></tbody></table></div>')
-        @table = $('table', @element)
+        @table = $('table', @container)
         buildTableHead()
         
       buildTableHead = =>
@@ -95,7 +95,7 @@
           if column.sortable
             $('div',th).append('<span class="jTable-sort jTable-sort-none"></span>')
             th.click =>
-              $('.jTable-column-heading span').removeClass('jTable-sort-asc jTable-sort-desc')
+              $('.jTable-column-heading span', @container).removeClass('jTable-sort-asc jTable-sort-desc')
               attribute = $(event.currentTarget).attr('data-jTable-column-attribute')
               sort_icon = $('span', $(event.currentTarget))
               if @query.sort_column == attribute
@@ -152,7 +152,7 @@
               destroy_link.attr('data-jTable-destroy-url', @settings.destroyUrl.replace(/\:identifier/, item[@settings.identifierAttribute]))
               destroy_link.click (event) =>
                 $.ajax({
-                  url: $(event.target).attr('data-jTable-destroy-url')
+                  url: $(event.currentTarget).attr('data-jTable-destroy-url')
                   type: 'POST'
                   data: {'_method': 'DELETE'}
                   success: (data, status, xhr) =>
@@ -166,7 +166,7 @@
           table_body.append(new_row)
         
       buildSearch = =>
-        $('.jTable-full-search-container.').remove()
+        $('.jTable-full-search-container.', @container).remove()
         search_field = $('<input type="text" />')
         search_field.keyup =>
           @query.search = search_field.val()
@@ -189,14 +189,14 @@
         updatePagination()
         
       updatePageInfo = =>
-        page_info = $('.jTable-page-info')
+        page_info = $('.jTable-page-info', @container)
         start_items = ((@page-1)*@settings.perPage)+1
         end_items = start_items+@settings.perPage-1
         total_items = @items_count
         page_info.html("Displaying #{start_items} to #{end_items} of #{total_items} items.")
         
       updatePagination = =>
-        page_div = $('.jTable-pagination-container')
+        page_div = $('.jTable-pagination-container', @container)
         page_div.html('')
         generatePaginationButton = (page_number) =>
           $("<span class='jTable-button jTable-pagination-button' data-jTable-pagination-page='#{page_number}'>#{page_number}</span>").click (event) =>
@@ -226,7 +226,7 @@
             @stale_paging = true
             changePage(@page+1)
           page_div.append(next_page_link)
-        $(".jTable-pagination-button[data-jTable-pagination-page=#{@page}]").addClass('jTable-pagination-current-page')
+        $(".jTable-pagination-button[data-jTable-pagination-page=#{@page}]", @container).addClass('jTable-pagination-current-page')
         
       changePage = (new_page) =>
         if @settings.serverSidePagination
