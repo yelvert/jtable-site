@@ -1,4 +1,5 @@
 class IcdCode < ActiveRecord::Base
+=begin
   def self.from_query(query, serverSidePagination)
     icd_codes = self
     unless query.nil?
@@ -42,4 +43,5 @@ class IcdCode < ActiveRecord::Base
       icd_codes
     end
   end
+=end
 end

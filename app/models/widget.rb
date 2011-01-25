@@ -1,4 +1,5 @@
 class Widget < ActiveRecord::Base
+=begin
   def self.from_query(query, serverSidePagination)
     widgets = self
     unless query.nil?
@@ -42,4 +43,5 @@ class Widget < ActiveRecord::Base
       widgets
     end
   end
+=end
 end

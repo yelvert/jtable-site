@@ -2,7 +2,7 @@ class IcdCodesController < ApplicationController
   # GET /icd_codes
   # GET /icd_codes.xml
   def index
-    @icd_codes = IcdCode.from_query(params[:jTableQuery], true)
+    @icd_codes = IcdCode.from_jtable_query(params[:jTableQuery], true)
 
     respond_to do |format|
       format.html do
