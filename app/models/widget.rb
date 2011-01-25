@@ -7,7 +7,11 @@ class Widget < ActiveRecord::Base
         search_terms.each do |term|
           where_query = []
           query[:searchable_columns].each do |column|
-            where_query << widgets.arel_table[column.to_sym].matches("%#{term}%")
+            if widgets.arel_table[column.to_sym].column.type == :integer
+              where_query << widgets.arel_table[column.to_sym].eq(term.to_i)
+            else
+              where_query << widgets.arel_table[column.to_sym].matches("%#{term}%")
+            end
           end
           widgets = widgets.where(where_query.inject(&:or))
         end

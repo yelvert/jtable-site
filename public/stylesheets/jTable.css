@@ -119,6 +119,10 @@ dark-blue:    rgb(39,121,170)
   border-left: none;
 }
 
+.jTable-column-footer input {
+  width: 90%;
+}
+
 .jTable-bottom-toolbar {
   padding: 5px;
   -moz-border-radius-bottomright: 6px;
