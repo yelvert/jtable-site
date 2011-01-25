@@ -8,10 +8,12 @@ module ActiveRecord
           search_terms.each do |term|
             where_query = []
             query[:searchable_columns].each do |column|
-              if [:integer, :date, :boolean].include? rel.arel_table[column.to_sym].column.type
-                where_query << rel.arel_table[column.to_sym].eq(term.to_i)
-              else
-                where_query << rel.arel_table[column.to_sym].matches("%#{term}%")
+              unless [:date].include? rel.arel_table[column.to_sym].column.type
+                if [:integer, :boolean].include? rel.arel_table[column.to_sym].column.type
+                  where_query << rel.arel_table[column.to_sym].eq(term.to_i)
+                else
+                  where_query << rel.arel_table[column.to_sym].matches("%#{term}%")
+                end
               end
             end
             rel = rel.where(where_query.inject(&:or))
@@ -19,11 +21,13 @@ module ActiveRecord
         end
         unless query[:column_search].blank?
           query[:column_search].each_pair do |column,search|
-            if [:integer, :date, :boolean].include? rel.arel_table[column.to_sym].column.type
-              rel = rel.where(rel.arel_table[column.to_sym].eq(search))
-            else
-              search.split(" ").each do |term|
-                rel = rel.where(rel.arel_table[column.to_sym].matches("%#{term}%"))
+            unless [:date].include? rel.arel_table[column.to_sym].column.type
+              if [:integer, :boolean].include? rel.arel_table[column.to_sym].column.type
+                rel = rel.where(rel.arel_table[column.to_sym].eq(search))
+              else
+                search.split(" ").each do |term|
+                  rel = rel.where(rel.arel_table[column.to_sym].matches("%#{term}%"))
+                end
               end
             end
           end
