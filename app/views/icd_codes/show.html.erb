@@ -1,0 +1,50 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Identifier:</b>
+  <%= @icd_code.identifier %>
+</p>
+
+<p>
+  <b>Short description:</b>
+  <%= @icd_code.short_description %>
+</p>
+
+<p>
+  <b>Medium description:</b>
+  <%= @icd_code.medium_description %>
+</p>
+
+<p>
+  <b>Description:</b>
+  <%= @icd_code.description %>
+</p>
+
+<p>
+  <b>Code type:</b>
+  <%= @icd_code.code_type %>
+</p>
+
+<p>
+  <b>Mcc:</b>
+  <%= @icd_code.mcc %>
+</p>
+
+<p>
+  <b>Cc:</b>
+  <%= @icd_code.cc %>
+</p>
+
+<p>
+  <b>Activated:</b>
+  <%= @icd_code.activated %>
+</p>
+
+<p>
+  <b>Deactivated:</b>
+  <%= @icd_code.deactivated %>
+</p>
+
+
+<%= link_to 'Edit', edit_icd_code_path(@icd_code) %> |
+<%= link_to 'Back', icd_codes_path %>

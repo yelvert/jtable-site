@@ -84,7 +84,6 @@
       buildTable = =>
         @container.append('<div class="jTable-table-container"><table class="jTable-table"><thead></thead><tbody></tbody><tfoot></tfoot></table></div>')
         @table = $('table', @container)
-        @table.css({'max-width': @settings.width})
         buildTableHead()
         if @settings.singleColumnSearch
           buildTableFoot()

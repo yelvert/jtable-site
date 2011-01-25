@@ -1,0 +1,23 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  identifier: MyString
+  short_description: MyString
+  medium_description: MyString
+  description: MyText
+  code_type: MyString
+  mcc: false
+  cc: false
+  activated: 2011-01-25
+  deactivated: 2011-01-25
+
+two:
+  identifier: MyString
+  short_description: MyString
+  medium_description: MyString
+  description: MyText
+  code_type: MyString
+  mcc: false
+  cc: false
+  activated: 2011-01-25
+  deactivated: 2011-01-25

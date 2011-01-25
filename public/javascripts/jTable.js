@@ -1,5 +1,5 @@
-/* DO NOT MODIFY. This file was compiled Tue, 25 Jan 2011 18:37:10 GMT from
- * /Users/yelvert/projects/jTable/app/coffeescripts/jTable.coffee
+/* DO NOT MODIFY. This file was compiled Tue, 25 Jan 2011 21:18:34 GMT from
+ * /Users/yelvert/projects/jtable/app/coffeescripts/jTable.coffee
  */
 
 var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
@@ -111,9 +111,6 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
       buildTable = __bind(function() {
         this.container.append('<div class="jTable-table-container"><table class="jTable-table"><thead></thead><tbody></tbody><tfoot></tfoot></table></div>');
         this.table = $('table', this.container);
-        this.table.css({
-          'max-width': this.settings.width
-        });
         buildTableHead();
         if (this.settings.singleColumnSearch) {
           return buildTableFoot();
