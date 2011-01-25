@@ -1,4 +1,4 @@
-/* DO NOT MODIFY. This file was compiled Tue, 25 Jan 2011 21:18:34 GMT from
+/* DO NOT MODIFY. This file was compiled Tue, 25 Jan 2011 22:16:10 GMT from
  * /Users/yelvert/projects/jtable/app/coffeescripts/jTable.coffee
  */
 
@@ -172,7 +172,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
             if (column.searchable) {
               th = $('<th class="jTable-column-footer"></th>');
               search_field = $("<input type='text' jTable-column-attribute='" + column.attribute + "'>");
-              search_field.keyup(__bind(function() {
+              search_field.keyup(__bind(function(event) {
                 var attribute, current_search, field;
                 field = $(event.currentTarget);
                 attribute = field.attr('jTable-column-attribute');

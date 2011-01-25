@@ -99,7 +99,7 @@
             th.html("<div>#{column.heading}</div>")
           if column.sortable
             $('div',th).append('<span class="jTable-sort jTable-sort-none"></span>')
-            th.click =>
+            th.click (event) =>
               $('.jTable-column-heading span', @container).removeClass('jTable-sort-asc jTable-sort-desc')
               attribute = $(event.currentTarget).attr('data-jTable-column-attribute')
               sort_icon = $('span', $(event.currentTarget))
@@ -130,7 +130,7 @@
             if column.searchable
               th = $('<th class="jTable-column-footer"></th>')
               search_field = $("<input type='text' jTable-column-attribute='#{column.attribute}'>")
-              search_field.keyup =>
+              search_field.keyup (event) =>
                 field = $(event.currentTarget)
                 attribute = field.attr('jTable-column-attribute')
                 @query.column_search[attribute] = field.val()
