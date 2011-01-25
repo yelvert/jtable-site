@@ -1,4 +1,4 @@
-/* DO NOT MODIFY. This file was compiled Tue, 25 Jan 2011 16:34:15 GMT from
+/* DO NOT MODIFY. This file was compiled Tue, 25 Jan 2011 18:37:10 GMT from
  * /Users/yelvert/projects/jTable/app/coffeescripts/jTable.coffee
  */
 
@@ -14,6 +14,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         fullPagination: true,
         serverSidePagination: false,
         ajaxInterval: 250,
+        noItemsMsg: "No Records were found.",
         rowClass: '',
         width: '',
         indexUrl: '',
@@ -200,74 +201,83 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         }
       }, this);
       updateTableRows = __bind(function() {
-        var actions_cell, column, destroy_link, edit_link, i, item, new_cell, new_row, table_body, _i, _len, _len2, _ref, _ref2, _results;
+        var actions_cell, blank_row, column, column_count, destroy_link, edit_link, i, item, new_cell, new_row, table_body, _i, _len, _len2, _ref, _ref2, _results;
         table_body = $('tbody', this.table);
         table_body.html('');
-        _ref = this.items;
-        _results = [];
-        for (i = 0, _len = _ref.length; i < _len; i++) {
-          item = _ref[i];
-          new_row = $("<tr data-jTable-row-index='" + i + "'></tr>");
-          if (i % 2 === 0) {
-            new_row.addClass("jTable-row-even");
-          } else {
-            new_row.addClass("jTable-row-odd");
-          }
-          new_row.addClass(this.settings.rowClass);
-          new_row.attr('data-jTable-item-identifier', item[this.settings.identifierAttribute]);
-          _ref2 = this.settings.columns;
-          for (_i = 0, _len2 = _ref2.length; _i < _len2; _i++) {
-            column = _ref2[_i];
-            new_cell = $('<td class="jTable-cell"></td>');
-            new_cell.addClass(column.columnClass);
-            new_cell.attr({
-              'data-jTable-cell-attribute': column.attribute,
-              'data-jTable-cell-value': item[column.attribute]
-            });
-            if (column.dataType === 'boolean') {
-              if (item[column.attribute]) {
-                new_cell.html(column.trueValue);
-              } else {
-                new_cell.html(column.falseValue);
-              }
-            } else {
-              new_cell.html(item[column.attribute]);
-            }
-            new_row.append(new_cell);
-          }
+        if (this.items_count === 0) {
+          column_count = this.settings.columns.length;
           if (this.settings.editLink || this.settings.destroyLink) {
-            actions_cell = $('<td class="jTable-actions-cell jTable-cell"></td>');
-            if (this.settings.editLink) {
-              edit_link = $("<a>Edit</a>");
-              edit_link.attr('href', this.settings.editUrl.replace(/\:identifier/, item[this.settings.identifierAttribute]));
-              actions_cell.append(edit_link);
-            }
-            if (this.settings.destroyLink) {
-              destroy_link = $("<a href='#'>Destroy</a>");
-              destroy_link.attr('data-jTable-destroy-url', this.settings.destroyUrl.replace(/\:identifier/, item[this.settings.identifierAttribute]));
-              destroy_link.click(__bind(function(event) {
-                $.ajax({
-                  url: $(event.currentTarget).attr('data-jTable-destroy-url'),
-                  type: 'POST',
-                  data: {
-                    '_method': 'DELETE'
-                  },
-                  success: __bind(function(data, status, xhr) {
-                    return this.settings.onDestroy(data);
-                  }, this),
-                  error: __bind(function(xhr, status, error) {
-                    return element.trigger('ajax:error', [xhr, status, error]);
-                  }, this)
-                });
-                return fetchItems();
-              }, this));
-              actions_cell.append(destroy_link);
-            }
-            new_row.append(actions_cell);
+            column_count += 1;
           }
-          _results.push(table_body.append(new_row));
+          blank_row = $("<tr><td colspan='" + column_count + "' class='jTable-cell jTable-no-items-row'>" + this.settings.noItemsMsg + "</td></tr>");
+          return table_body.append(blank_row);
+        } else {
+          _ref = this.items;
+          _results = [];
+          for (i = 0, _len = _ref.length; i < _len; i++) {
+            item = _ref[i];
+            new_row = $("<tr data-jTable-row-index='" + i + "'></tr>");
+            if (i % 2 === 0) {
+              new_row.addClass("jTable-row-even");
+            } else {
+              new_row.addClass("jTable-row-odd");
+            }
+            new_row.addClass(this.settings.rowClass);
+            new_row.attr('data-jTable-item-identifier', item[this.settings.identifierAttribute]);
+            _ref2 = this.settings.columns;
+            for (_i = 0, _len2 = _ref2.length; _i < _len2; _i++) {
+              column = _ref2[_i];
+              new_cell = $('<td class="jTable-cell"></td>');
+              new_cell.addClass(column.columnClass);
+              new_cell.attr({
+                'data-jTable-cell-attribute': column.attribute,
+                'data-jTable-cell-value': item[column.attribute]
+              });
+              if (column.dataType === 'boolean') {
+                if (item[column.attribute]) {
+                  new_cell.html(column.trueValue);
+                } else {
+                  new_cell.html(column.falseValue);
+                }
+              } else {
+                new_cell.html(item[column.attribute]);
+              }
+              new_row.append(new_cell);
+            }
+            if (this.settings.editLink || this.settings.destroyLink) {
+              actions_cell = $('<td class="jTable-actions-cell jTable-cell"></td>');
+              if (this.settings.editLink) {
+                edit_link = $("<a>Edit</a>");
+                edit_link.attr('href', this.settings.editUrl.replace(/\:identifier/, item[this.settings.identifierAttribute]));
+                actions_cell.append(edit_link);
+              }
+              if (this.settings.destroyLink) {
+                destroy_link = $("<a href='#'>Destroy</a>");
+                destroy_link.attr('data-jTable-destroy-url', this.settings.destroyUrl.replace(/\:identifier/, item[this.settings.identifierAttribute]));
+                destroy_link.click(__bind(function(event) {
+                  $.ajax({
+                    url: $(event.currentTarget).attr('data-jTable-destroy-url'),
+                    type: 'POST',
+                    data: {
+                      '_method': 'DELETE'
+                    },
+                    success: __bind(function(data, status, xhr) {
+                      return this.settings.onDestroy(data);
+                    }, this),
+                    error: __bind(function(xhr, status, error) {
+                      return element.trigger('ajax:error', [xhr, status, error]);
+                    }, this)
+                  });
+                  return fetchItems();
+                }, this));
+                actions_cell.append(destroy_link);
+              }
+              new_row.append(actions_cell);
+            }
+            _results.push(table_body.append(new_row));
+          }
+          return _results;
         }
-        return _results;
       }, this);
       buildSearch = __bind(function() {
         var search_container, search_field;
@@ -300,8 +310,8 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
       updatePageInfo = __bind(function() {
         var end_items, page_info, start_items, total_items;
         page_info = $('.jTable-page-info', this.container);
-        start_items = ((this.page - 1) * this.settings.perPage) + 1;
-        end_items = start_items + this.settings.perPage - 1;
+        start_items = this.items_count === 0 ? 0 : ((this.page - 1) * this.settings.perPage) + 1;
+        end_items = this.items_count - start_items > this.settings.perPage ? start_items + this.settings.perPage - 1 : this.items_count;
         total_items = this.items_count;
         return page_info.html("Displaying " + start_items + " to " + end_items + " of " + total_items + " items.");
       }, this);

@@ -9,6 +9,7 @@
         fullPagination: true
         serverSidePagination: false
         ajaxInterval: 250
+        noItemsMsg: "No Records were found."
         rowClass: ''
         width: ''
         indexUrl: ''
@@ -151,49 +152,56 @@
       updateTableRows = =>
         table_body = $('tbody', @table)
         table_body.html('')
-        for item, i in @items
-          new_row = $("<tr data-jTable-row-index='#{i}'></tr>")
-          if i%2==0
-            new_row.addClass("jTable-row-even")
-          else
-            new_row.addClass("jTable-row-odd")
-          new_row.addClass(@settings.rowClass)
-          new_row.attr('data-jTable-item-identifier', item[@settings.identifierAttribute])
-          for column in @settings.columns
-            new_cell = $('<td class="jTable-cell"></td>')
-            new_cell.addClass(column.columnClass)
-            new_cell.attr({'data-jTable-cell-attribute': column.attribute, 'data-jTable-cell-value': item[column.attribute]})
-            if column.dataType == 'boolean'
-              if item[column.attribute]
-                new_cell.html(column.trueValue)
-              else
-                new_cell.html(column.falseValue)
-            else
-              new_cell.html(item[column.attribute])
-            new_row.append(new_cell)
+        if @items_count == 0
+          column_count = @settings.columns.length
           if @settings.editLink or @settings.destroyLink
-            actions_cell = $('<td class="jTable-actions-cell jTable-cell"></td>')
-            if @settings.editLink
-              edit_link = $("<a>Edit</a>")
-              edit_link.attr('href', @settings.editUrl.replace(/\:identifier/, item[@settings.identifierAttribute]))
-              actions_cell.append(edit_link)
-            if @settings.destroyLink
-              destroy_link = $("<a href='#'>Destroy</a>")
-              destroy_link.attr('data-jTable-destroy-url', @settings.destroyUrl.replace(/\:identifier/, item[@settings.identifierAttribute]))
-              destroy_link.click (event) =>
-                $.ajax({
-                  url: $(event.currentTarget).attr('data-jTable-destroy-url')
-                  type: 'POST'
-                  data: {'_method': 'DELETE'}
-                  success: (data, status, xhr) =>
-                    @settings.onDestroy(data)
-                  error: (xhr, status, error) =>
-                    element.trigger('ajax:error', [xhr, status, error]);
-                })
-                fetchItems()
-              actions_cell.append(destroy_link)
-            new_row.append(actions_cell)
-          table_body.append(new_row)
+            column_count += 1
+          blank_row = $("<tr><td colspan='#{column_count}' class='jTable-cell jTable-no-items-row'>#{@settings.noItemsMsg}</td></tr>")
+          table_body.append(blank_row)
+        else
+          for item, i in @items
+            new_row = $("<tr data-jTable-row-index='#{i}'></tr>")
+            if i%2==0
+              new_row.addClass("jTable-row-even")
+            else
+              new_row.addClass("jTable-row-odd")
+            new_row.addClass(@settings.rowClass)
+            new_row.attr('data-jTable-item-identifier', item[@settings.identifierAttribute])
+            for column in @settings.columns
+              new_cell = $('<td class="jTable-cell"></td>')
+              new_cell.addClass(column.columnClass)
+              new_cell.attr({'data-jTable-cell-attribute': column.attribute, 'data-jTable-cell-value': item[column.attribute]})
+              if column.dataType == 'boolean'
+                if item[column.attribute]
+                  new_cell.html(column.trueValue)
+                else
+                  new_cell.html(column.falseValue)
+              else
+                new_cell.html(item[column.attribute])
+              new_row.append(new_cell)
+            if @settings.editLink or @settings.destroyLink
+              actions_cell = $('<td class="jTable-actions-cell jTable-cell"></td>')
+              if @settings.editLink
+                edit_link = $("<a>Edit</a>")
+                edit_link.attr('href', @settings.editUrl.replace(/\:identifier/, item[@settings.identifierAttribute]))
+                actions_cell.append(edit_link)
+              if @settings.destroyLink
+                destroy_link = $("<a href='#'>Destroy</a>")
+                destroy_link.attr('data-jTable-destroy-url', @settings.destroyUrl.replace(/\:identifier/, item[@settings.identifierAttribute]))
+                destroy_link.click (event) =>
+                  $.ajax({
+                    url: $(event.currentTarget).attr('data-jTable-destroy-url')
+                    type: 'POST'
+                    data: {'_method': 'DELETE'}
+                    success: (data, status, xhr) =>
+                      @settings.onDestroy(data)
+                    error: (xhr, status, error) =>
+                      element.trigger('ajax:error', [xhr, status, error]);
+                  })
+                  fetchItems()
+                actions_cell.append(destroy_link)
+              new_row.append(actions_cell)
+            table_body.append(new_row)
         
       buildSearch = =>
         $('.jTable-full-search-container.', @container).remove()
@@ -220,8 +228,8 @@
         
       updatePageInfo = =>
         page_info = $('.jTable-page-info', @container)
-        start_items = ((@page-1)*@settings.perPage)+1
-        end_items = start_items+@settings.perPage-1
+        start_items = if @items_count == 0 then 0 else ((@page-1)*@settings.perPage)+1
+        end_items = if @items_count-start_items > @settings.perPage then start_items+@settings.perPage-1 else @items_count
         total_items = @items_count
         page_info.html("Displaying #{start_items} to #{end_items} of #{total_items} items.")
         

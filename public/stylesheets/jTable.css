@@ -101,6 +101,11 @@ dark-blue:    rgb(39,121,170)
   padding: 1px 3px;
 }
 
+.jTable-no-items-row {
+  text-align: center;
+  background-color: rgb(174,208,234);
+}
+
 .jTable-actions-cell {
   text-align: center;
 }
