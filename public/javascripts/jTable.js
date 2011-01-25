@@ -1,4 +1,4 @@
-/* DO NOT MODIFY. This file was compiled Tue, 25 Jan 2011 22:16:10 GMT from
+/* DO NOT MODIFY. This file was compiled Tue, 25 Jan 2011 22:52:25 GMT from
  * /Users/yelvert/projects/jtable/app/coffeescripts/jTable.coffee
  */
 
@@ -131,7 +131,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
           }
           if (column.sortable) {
             $('div', th).append('<span class="jTable-sort jTable-sort-none"></span>');
-            th.click(__bind(function() {
+            th.click(__bind(function(event) {
               var attribute, sort_icon;
               $('.jTable-column-heading span', this.container).removeClass('jTable-sort-asc jTable-sort-desc');
               attribute = $(event.currentTarget).attr('data-jTable-column-attribute');
@@ -406,6 +406,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
       this.initial_load = true;
       this.stale_paging = false;
       this.items = [];
+      this.items_count = 0;
       this.container.data('jTable', {});
       this.container.data('jTable').settings = this.settings;
       this.previous_query = $.extend(true, {}, this.query);
