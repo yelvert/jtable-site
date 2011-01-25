@@ -8,7 +8,7 @@ module ActiveRecord
           search_terms.each do |term|
             where_query = []
             query[:searchable_columns].each do |column|
-              if rel.arel_table[column.to_sym].column.type == :integer
+              if [:integer, :date, :boolean].iclude? rel.arel_table[column.to_sym].column.type
                 where_query << rel.arel_table[column.to_sym].eq(term.to_i)
               else
                 where_query << rel.arel_table[column.to_sym].matches("%#{term}%")
@@ -19,8 +19,12 @@ module ActiveRecord
         end
         unless query[:column_search].blank?
           query[:column_search].each_pair do |column,search|
-            search.split(" ").each do |term|
-              rel = rel.where(rel.arel_table[column.to_sym].matches("%#{term}%"))
+            if [:integer, :date, :boolean].iclude? rel.arel_table[column.to_sym].column.type
+              rel = rel.where(rel.arel_table[column.to_sym].eq(search))
+            else
+              search.split(" ").each do |term|
+                rel = rel.where(rel.arel_table[column.to_sym].matches("%#{term}%"))
+              end
             end
           end
         end
