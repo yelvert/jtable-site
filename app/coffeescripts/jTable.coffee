@@ -14,6 +14,8 @@
         rowClass: ''
         width: ''
         indexUrl: ''
+        viewLink: true
+        viewUrl: '?id=:identifier'
         editLink: true
         editUrl: 'edit?id=:identifier'
         destroyLink: true
@@ -138,7 +140,7 @@
                 sort_icon.addClass('jTable-sort-asc')
               fetchItems()
           table_head.append($(th))
-        if @settings.editLink or @settings.destroyLink
+        if @show_links
           table_head.append($('<th class="jTable-column-heading">&nbsp</th>'))
         
       buildTableFoot = =>
@@ -163,7 +165,7 @@
             else
               th = $('<th class="jTable-column-footer">&nbsp;</th>')
             table_foot.append(th)
-          if @settings.editLink or @settings.destroyLink
+          if @show_links
             table_foot.append($('<th class="jTable-column-footer">&nbsp;</th>'))
         
       updateTableRows = =>
@@ -171,7 +173,7 @@
         table_body.html('')
         if @items_count == 0
           column_count = @settings.columns.length
-          if @settings.editLink or @settings.destroyLink
+          if @show_links
             column_count += 1
           blank_row = $("<tr><td colspan='#{column_count}' class='jTable-cell jTable-no-items-row'>#{@settings.noItemsMsg}</td></tr>")
           table_body.append(blank_row)
@@ -196,8 +198,12 @@
               else
                 new_cell.html(item[column.attribute])
               new_row.append(new_cell)
-            if @settings.editLink or @settings.destroyLink
+            if @show_links
               actions_cell = $('<td class="jTable-actions-cell jTable-cell"></td>')
+              if @settings.viewLink
+                view_link = $("<a>View</a>")
+                view_link.attr('href', @settings.viewUrl.replace(/\:identifier/, item[@settings.identifierAttribute]))
+                actions_cell.append(view_link)
               if @settings.editLink
                 edit_link = $("<a>Edit</a>")
                 edit_link.attr('href', @settings.editUrl.replace(/\:identifier/, item[@settings.identifierAttribute]))
@@ -336,6 +342,7 @@
       @initial_load = true
       @stale_paging = false
       @items = []
+      @show_links = @settings.viewLink or @settings.editLink or @settings.destroyLink
       @container.data('jTable', {})
       @container.data('jTable').settings = @settings
       @previous_query = $.extend(true, {}, @query)

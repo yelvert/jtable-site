@@ -1,4 +1,4 @@
-/* DO NOT MODIFY. This file was compiled Wed, 26 Jan 2011 20:44:35 GMT from
+/* DO NOT MODIFY. This file was compiled Wed, 26 Jan 2011 21:03:52 GMT from
  * /Users/yelvert/projects/jtable/app/coffeescripts/jTable.coffee
  */
 
@@ -19,6 +19,8 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         rowClass: '',
         width: '',
         indexUrl: '',
+        viewLink: true,
+        viewUrl: '?id=:identifier',
         editLink: true,
         editUrl: 'edit?id=:identifier',
         destroyLink: true,
@@ -179,7 +181,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
           }
           table_head.append($(th));
         }
-        if (this.settings.editLink || this.settings.destroyLink) {
+        if (this.show_links) {
           return table_head.append($('<th class="jTable-column-heading">&nbsp</th>'));
         }
       }, this);
@@ -213,18 +215,18 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
             }
             table_foot.append(th);
           }
-          if (this.settings.editLink || this.settings.destroyLink) {
+          if (this.show_links) {
             return table_foot.append($('<th class="jTable-column-footer">&nbsp;</th>'));
           }
         }
       }, this);
       updateTableRows = __bind(function() {
-        var actions_cell, blank_row, column, column_count, destroy_link, edit_link, i, item, new_cell, new_row, table_body, _i, _len, _len2, _ref, _ref2, _results;
+        var actions_cell, blank_row, column, column_count, destroy_link, edit_link, i, item, new_cell, new_row, table_body, view_link, _i, _len, _len2, _ref, _ref2, _results;
         table_body = $('tbody', this.table);
         table_body.html('');
         if (this.items_count === 0) {
           column_count = this.settings.columns.length;
-          if (this.settings.editLink || this.settings.destroyLink) {
+          if (this.show_links) {
             column_count += 1;
           }
           blank_row = $("<tr><td colspan='" + column_count + "' class='jTable-cell jTable-no-items-row'>" + this.settings.noItemsMsg + "</td></tr>");
@@ -262,8 +264,13 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
               }
               new_row.append(new_cell);
             }
-            if (this.settings.editLink || this.settings.destroyLink) {
+            if (this.show_links) {
               actions_cell = $('<td class="jTable-actions-cell jTable-cell"></td>');
+              if (this.settings.viewLink) {
+                view_link = $("<a>View</a>");
+                view_link.attr('href', this.settings.viewUrl.replace(/\:identifier/, item[this.settings.identifierAttribute]));
+                actions_cell.append(view_link);
+              }
               if (this.settings.editLink) {
                 edit_link = $("<a>Edit</a>");
                 edit_link.attr('href', this.settings.editUrl.replace(/\:identifier/, item[this.settings.identifierAttribute]));
@@ -446,6 +453,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
       this.initial_load = true;
       this.stale_paging = false;
       this.items = [];
+      this.show_links = this.settings.viewLink || this.settings.editLink || this.settings.destroyLink;
       this.container.data('jTable', {});
       this.container.data('jTable').settings = this.settings;
       this.previous_query = $.extend(true, {}, this.query);
