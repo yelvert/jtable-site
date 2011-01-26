@@ -2,23 +2,26 @@
 
 <div id="icd_codes"></div>
 <script type="text/javascript" charset="utf-8">
-  $("#icd_codes").jTable({
-    width: '100%',
-    serverSidePagination: true,
-    singleColumnSearch: true,
-    indexUrl: "/icd_codes.json",
-    editUrl: "/icd_codes/:identifier/edit",
-    destroyUrl: "/icd_codes/:identifier.js",
-    columns: [
-      {heading: 'Identifier', attribute: 'identifier', columnClass: 'center'},
-      {heading: 'Short Description', attribute: 'short_description'},
-      {heading: 'Full Description', attribute: 'description'},
-      {heading: 'Code Type', attribute: 'code_type', columnClass: 'center'},
-      {heading: 'MCC', attribute: 'mcc', dataType: 'boolean', trueValue: 'Yes', falseValue: 'No', columnClass: 'center'},
-      {heading: 'CC', attribute: 'cc', dataType: 'boolean', trueValue: 'Yes', falseValue: 'No', columnClass: 'center'},
-      {heading: 'Activation Date', attribute: 'activated', columnClass: 'center'},
-      {heading: 'Deactivation Date', attribute: 'deactivated', columnClass: 'center'}
-    ]
+  
+  $(document).ready(function() {
+    $("#icd_codes").jTable({
+      width: '100%',
+      serverSidePagination: true,
+      singleColumnSearch: true,
+      indexUrl: "/icd_codes.json",
+      editUrl: "/icd_codes/:identifier/edit",
+      destroyUrl: "/icd_codes/:identifier.js",
+      columns: [
+        {heading: 'Identifier', attribute: 'identifier', columnClass: 'center'},
+        {heading: 'Short Description', attribute: 'short_description'},
+        {heading: 'Full Description', attribute: 'description'},
+        {heading: 'Code Type', attribute: 'code_type', columnClass: 'center'},
+        {heading: 'MCC', attribute: 'mcc', dataType: 'boolean', trueValue: 'Yes', falseValue: 'No', columnClass: 'center'},
+        {heading: 'CC', attribute: 'cc', dataType: 'boolean', trueValue: 'Yes', falseValue: 'No', columnClass: 'center'},
+        {heading: 'Activation Date', attribute: 'activated', columnClass: 'center'},
+        {heading: 'Deactivation Date', attribute: 'deactivated', columnClass: 'center'}
+      ]
+    })
   })
 </script>
 

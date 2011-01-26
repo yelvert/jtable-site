@@ -177,6 +177,25 @@ dark-blue:    rgb(39,121,170)
   background-color: rgb(222,237,247);
 }
 
+.jTable-processing-overlay {
+  position: absolute;
+  z-index: 1001;
+  line-height: 50%;
+  background: url(/images/jtable_processing_bg.png) repeat;
+}
+
+.jTable-processing-overlay div {
+  margin: auto;
+  padding: 25px;
+  border: 1px solid black;
+  background-color: white;
+  width: 150px;
+  text-align: center;
+  -moz-border-radius: 15px;
+  -webkit-border-radius: 15px;
+  border-radius: 15px;
+}
+
 .left {
   text-align: left;
 }

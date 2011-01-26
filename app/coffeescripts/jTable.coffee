@@ -51,6 +51,8 @@
         if @query != @previous_query or @query.search == ""
           current_query = $.extend(true, {}, @query)
           @stale_paging = false
+          updateProcessingOverlay()
+          @processing_overlay.show()
           ajax = $.ajax({
             url: @settings.indexUrl
             data: {jTableQuery: current_query}
@@ -58,6 +60,7 @@
             success: (data, textStatus, XMLHttpRequest) =>
               updateItems(data)
               @initial_load = false
+              @processing_overlay.hide()
           })
           @previous_query = $.extend(true, {}, current_query)
         
@@ -75,6 +78,19 @@
         @container.data('jTable').items = @items
         updateTableRows()
         changePage(@page)
+        
+      updateProcessingOverlay = =>
+        new_css =
+          left: @container.position().left
+          top: @container.position().top
+          width: @container.width()
+          height: @container.height()
+        @processing_overlay.css(new_css)
+        container = @processing_overlay
+        box = $('div', @processing_overlay)
+        elem = box[0]
+        margin_top = if elem.offsetHeight < elem.parentNode.offsetHeight then parseInt((elem.parentNode.offsetHeight - elem.offsetHeight)/2)+"px" else "0"
+        box.css({'margin-top': margin_top})
         
       buildTopToolbar = =>
         toolbar = $('<div class="jTable-top-toolbar"></div>')
@@ -308,6 +324,8 @@
       @container.data('jTable').settings = @settings
       @previous_query = $.extend(true, {}, @query)
       @table = null
+      @processing_overlay = $("<div class='jTable-processing-overlay'><div>Processing...</div></div>")
+      $(document.body).append(@processing_overlay)
       @page = 1
       buildAll()
       changePage(1)

@@ -1,4 +1,4 @@
-/* DO NOT MODIFY. This file was compiled Tue, 25 Jan 2011 22:52:25 GMT from
+/* DO NOT MODIFY. This file was compiled Wed, 26 Jan 2011 00:19:52 GMT from
  * /Users/yelvert/projects/jtable/app/coffeescripts/jTable.coffee
  */
 
@@ -41,7 +41,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
       options = {};
     }
     return this.each(function() {
-      var buildAll, buildBottomToolbar, buildSearch, buildTable, buildTableFoot, buildTableHead, buildTopToolbar, changePage, column, fetchItems, generateBaseQuery, i, updateItems, updatePageInfo, updatePagination, updateTableRows, _len, _ref;
+      var buildAll, buildBottomToolbar, buildSearch, buildTable, buildTableFoot, buildTableHead, buildTopToolbar, changePage, column, fetchItems, generateBaseQuery, i, updateItems, updatePageInfo, updatePagination, updateProcessingOverlay, updateTableRows, _len, _ref;
       buildAll = __bind(function() {
         buildTopToolbar();
         buildTable();
@@ -69,6 +69,8 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         if (this.query !== this.previous_query || this.query.search === "") {
           current_query = $.extend(true, {}, this.query);
           this.stale_paging = false;
+          updateProcessingOverlay();
+          this.processing_overlay.show();
           ajax = $.ajax({
             url: this.settings.indexUrl,
             data: {
@@ -77,7 +79,8 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
             cache: false,
             success: __bind(function(data, textStatus, XMLHttpRequest) {
               updateItems(data);
-              return this.initial_load = false;
+              this.initial_load = false;
+              return this.processing_overlay.hide();
             }, this)
           });
           return this.previous_query = $.extend(true, {}, current_query);
@@ -101,6 +104,23 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         this.container.data('jTable').items = this.items;
         updateTableRows();
         return changePage(this.page);
+      }, this);
+      updateProcessingOverlay = __bind(function() {
+        var box, container, elem, margin_top, new_css;
+        new_css = {
+          left: this.container.position().left,
+          top: this.container.position().top,
+          width: this.container.width(),
+          height: this.container.height()
+        };
+        this.processing_overlay.css(new_css);
+        container = this.processing_overlay;
+        box = $('div', this.processing_overlay);
+        elem = box[0];
+        margin_top = elem.offsetHeight < elem.parentNode.offsetHeight ? parseInt((elem.parentNode.offsetHeight - elem.offsetHeight) / 2) + "px" : "0";
+        return box.css({
+          'margin-top': margin_top
+        });
       }, this);
       buildTopToolbar = __bind(function() {
         var toolbar;
@@ -406,11 +426,12 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
       this.initial_load = true;
       this.stale_paging = false;
       this.items = [];
-      this.items_count = 0;
       this.container.data('jTable', {});
       this.container.data('jTable').settings = this.settings;
       this.previous_query = $.extend(true, {}, this.query);
       this.table = null;
+      this.processing_overlay = $("<div class='jTable-processing-overlay'><div>Processing...</div></div>");
+      $(document.body).append(this.processing_overlay);
       this.page = 1;
       buildAll();
       return changePage(1);
