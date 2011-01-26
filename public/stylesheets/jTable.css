@@ -179,13 +179,13 @@ dark-blue:    rgb(39,121,170)
 
 .jTable-processing-overlay {
   position: absolute;
-  z-index: 1001;
+  z-index: 1000;
   line-height: 50%;
   background: url(/images/jtable_processing_bg.png) repeat;
 }
 
 .jTable-processing-overlay div {
-  margin: auto;
+  position: absolute;
   padding: 25px;
   border: 1px solid black;
   background-color: white;
@@ -194,6 +194,7 @@ dark-blue:    rgb(39,121,170)
   -moz-border-radius: 15px;
   -webkit-border-radius: 15px;
   border-radius: 15px;
+  z-index: 1001;
 }
 
 .left {

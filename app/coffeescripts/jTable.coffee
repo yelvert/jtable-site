@@ -80,17 +80,17 @@
         changePage(@page)
         
       updateProcessingOverlay = =>
-        new_css =
+        container_css =
           left: @container.position().left
           top: @container.position().top
           width: @container.width()
           height: @container.height()
-        @processing_overlay.css(new_css)
-        container = @processing_overlay
+        @processing_overlay.css(container_css)
         box = $('div', @processing_overlay)
-        elem = box[0]
-        margin_top = if elem.offsetHeight < elem.parentNode.offsetHeight then parseInt((elem.parentNode.offsetHeight - elem.offsetHeight)/2)+"px" else "0"
-        box.css({'margin-top': margin_top})
+        box_css =
+          left: parseInt(container_css.left,10)+(parseInt(container_css.width,10)/2)-75
+          top: parseInt(container_css.top,10)+(parseInt(container_css.top,10)/2)
+        box.css(box_css)
         
       buildTopToolbar = =>
         toolbar = $('<div class="jTable-top-toolbar"></div>')

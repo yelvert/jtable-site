@@ -1,4 +1,4 @@
-/* DO NOT MODIFY. This file was compiled Wed, 26 Jan 2011 00:19:52 GMT from
+/* DO NOT MODIFY. This file was compiled Wed, 26 Jan 2011 00:34:18 GMT from
  * /Users/yelvert/projects/jtable/app/coffeescripts/jTable.coffee
  */
 
@@ -106,21 +106,22 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         return changePage(this.page);
       }, this);
       updateProcessingOverlay = __bind(function() {
-        var box, container, elem, margin_top, new_css;
-        new_css = {
+        var box, box_css, container_css;
+        container_css = {
           left: this.container.position().left,
           top: this.container.position().top,
           width: this.container.width(),
           height: this.container.height()
         };
-        this.processing_overlay.css(new_css);
-        container = this.processing_overlay;
+        this.processing_overlay.css(container_css);
         box = $('div', this.processing_overlay);
-        elem = box[0];
-        margin_top = elem.offsetHeight < elem.parentNode.offsetHeight ? parseInt((elem.parentNode.offsetHeight - elem.offsetHeight) / 2) + "px" : "0";
-        return box.css({
-          'margin-top': margin_top
-        });
+        box_css = {
+          left: parseInt(container_css.left, 10) + (parseInt(container_css.width, 10) / 2) - 75,
+          top: parseInt(container_css.top, 10) + (parseInt(container_css.top, 10) / 2)
+        };
+        console.log(container_css);
+        console.log(box_css);
+        return box.css(box_css);
       }, this);
       buildTopToolbar = __bind(function() {
         var toolbar;
