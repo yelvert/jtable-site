@@ -31,6 +31,13 @@ dark-blue:    rgb(39,121,170)
 .jTable-full-search-container {
   float: left;
   width: 50%;
+  text-align: left;
+}
+
+.jTable-per-page-container {
+  float: right;
+  width: 50%;
+  text-align: right;
 }
 
 .jTable-table-container {

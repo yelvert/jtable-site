@@ -6,6 +6,7 @@
         identifierAttribute: 'id'
         singleColumnSearch: false
         perPage: 25
+        perPageOptions: [25,50,100]
         fullPagination: true
         serverSidePagination: false
         ajaxInterval: 250
@@ -96,6 +97,7 @@
         toolbar = $('<div class="jTable-top-toolbar"></div>')
         @container.append(toolbar)
         buildSearch()
+        buildPerPageSelect()
         
       buildTable = =>
         @container.append('<div class="jTable-table-container"><table class="jTable-table"><thead></thead><tbody></tbody><tfoot></tfoot></table></div>')
@@ -234,6 +236,20 @@
         search_container.html('Search: ')
         search_container.append(search_field)
         $('.jTable-top-toolbar', @container).prepend(search_container)
+        
+      buildPerPageSelect = =>
+        $('.jTable-per-page-container', @container).remove()
+        select_box = $('<select class="jTable-per-page-select"></select>')
+        for option in @settings.perPageOptions
+          opt = $("<option value='#{option}'>#{option}</option>")
+          select_box.append(opt)
+        select_box.change =>
+          @query.limit = parseInt(select_box.val(),10)
+          @settings.perPage = parseInt(select_box.val(),10)
+          fetchItems()
+        per_page_container = $('<div class="jTable-per-page-container">Items Per Page: </div>')
+        per_page_container.append(select_box)
+        $('.jTable-top-toolbar', @container).append(per_page_container)
         
       buildBottomToolbar = =>
         toolbar = $('<div class="jTable-bottom-toolbar"><div class="jTable-page-info"></div><div class="jTable-pagination-container"></div></div>')

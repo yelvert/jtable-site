@@ -1,4 +1,4 @@
-/* DO NOT MODIFY. This file was compiled Wed, 26 Jan 2011 00:44:44 GMT from
+/* DO NOT MODIFY. This file was compiled Wed, 26 Jan 2011 20:44:35 GMT from
  * /Users/yelvert/projects/jtable/app/coffeescripts/jTable.coffee
  */
 
@@ -11,6 +11,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         identifierAttribute: 'id',
         singleColumnSearch: false,
         perPage: 25,
+        perPageOptions: [25, 50, 100],
         fullPagination: true,
         serverSidePagination: false,
         ajaxInterval: 250,
@@ -41,7 +42,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
       options = {};
     }
     return this.each(function() {
-      var buildAll, buildBottomToolbar, buildSearch, buildTable, buildTableFoot, buildTableHead, buildTopToolbar, changePage, column, fetchItems, generateBaseQuery, i, updateItems, updatePageInfo, updatePagination, updateProcessingOverlay, updateTableRows, _len, _ref;
+      var buildAll, buildBottomToolbar, buildPerPageSelect, buildSearch, buildTable, buildTableFoot, buildTableHead, buildTopToolbar, changePage, column, fetchItems, generateBaseQuery, i, updateItems, updatePageInfo, updatePagination, updateProcessingOverlay, updateTableRows, _len, _ref;
       buildAll = __bind(function() {
         buildTopToolbar();
         buildTable();
@@ -119,15 +120,14 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
           left: (parseInt(container_css.width, 10) / 2) - 75,
           top: parseInt(container_css.height, 10) / 2
         };
-        console.log(container_css);
-        console.log(box_css);
         return box.css(box_css);
       }, this);
       buildTopToolbar = __bind(function() {
         var toolbar;
         toolbar = $('<div class="jTable-top-toolbar"></div>');
         this.container.append(toolbar);
-        return buildSearch();
+        buildSearch();
+        return buildPerPageSelect();
       }, this);
       buildTable = __bind(function() {
         this.container.append('<div class="jTable-table-container"><table class="jTable-table"><thead></thead><tbody></tbody><tfoot></tfoot></table></div>');
@@ -317,6 +317,25 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         search_container.html('Search: ');
         search_container.append(search_field);
         return $('.jTable-top-toolbar', this.container).prepend(search_container);
+      }, this);
+      buildPerPageSelect = __bind(function() {
+        var opt, option, per_page_container, select_box, _i, _len, _ref;
+        $('.jTable-per-page-container', this.container).remove();
+        select_box = $('<select class="jTable-per-page-select"></select>');
+        _ref = this.settings.perPageOptions;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          option = _ref[_i];
+          opt = $("<option value='" + option + "'>" + option + "</option>");
+          select_box.append(opt);
+        }
+        select_box.change(__bind(function() {
+          this.query.limit = parseInt(select_box.val(), 10);
+          this.settings.perPage = parseInt(select_box.val(), 10);
+          return fetchItems();
+        }, this));
+        per_page_container = $('<div class="jTable-per-page-container">Items Per Page: </div>');
+        per_page_container.append(select_box);
+        return $('.jTable-top-toolbar', this.container).append(per_page_container);
       }, this);
       buildBottomToolbar = __bind(function() {
         var toolbar;
