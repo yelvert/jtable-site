@@ -1,4 +1,4 @@
-/* DO NOT MODIFY. This file was compiled Wed, 26 Jan 2011 00:34:18 GMT from
+/* DO NOT MODIFY. This file was compiled Wed, 26 Jan 2011 00:44:44 GMT from
  * /Users/yelvert/projects/jtable/app/coffeescripts/jTable.coffee
  */
 
@@ -116,8 +116,8 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         this.processing_overlay.css(container_css);
         box = $('div', this.processing_overlay);
         box_css = {
-          left: parseInt(container_css.left, 10) + (parseInt(container_css.width, 10) / 2) - 75,
-          top: parseInt(container_css.top, 10) + (parseInt(container_css.top, 10) / 2)
+          left: (parseInt(container_css.width, 10) / 2) - 75,
+          top: parseInt(container_css.height, 10) / 2
         };
         console.log(container_css);
         console.log(box_css);

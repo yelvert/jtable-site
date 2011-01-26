@@ -88,8 +88,8 @@
         @processing_overlay.css(container_css)
         box = $('div', @processing_overlay)
         box_css =
-          left: parseInt(container_css.left,10)+(parseInt(container_css.width,10)/2)-75
-          top: parseInt(container_css.top,10)+(parseInt(container_css.top,10)/2)
+          left: (parseInt(container_css.width,10)/2)-75
+          top: (parseInt(container_css.height,10)/2)
         box.css(box_css)
         
       buildTopToolbar = =>
