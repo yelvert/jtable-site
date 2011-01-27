@@ -15,13 +15,14 @@
         width: ''
         indexUrl: ''
         viewLink: true
-        viewUrl: '?id=:identifier'
+        viewUrl: '?id=:id'
         editLink: true
-        editUrl: 'edit?id=:identifier'
+        editUrl: 'edit?id=:id'
         destroyLink: true
-        destroyUrl: '?id=:identifier'
+        destroyUrl: '?id=:id'
         onDestroy: ->
           alert('Item successfully destroyed.')
+        otherActions: []
       column:
         searchable: true
         sortable: true
@@ -200,17 +201,23 @@
               new_row.append(new_cell)
             if @show_links
               actions_cell = $('<td class="jTable-actions-cell jTable-cell"></td>')
+              for action in @settings.otherActions
+                action_link = $("<a>#{action.title}</a>")
+                for name, value of action
+                  unless name == "title"
+                    action_link.attr(name, insertItemAttributesIntoString(item, value))
+                actions_cell.append(action_link)
               if @settings.viewLink
                 view_link = $("<a>View</a>")
-                view_link.attr('href', @settings.viewUrl.replace(/\:identifier/, item[@settings.identifierAttribute]))
+                view_link.attr('href', insertItemAttributesIntoString(item, @settings.viewUrl))
                 actions_cell.append(view_link)
               if @settings.editLink
                 edit_link = $("<a>Edit</a>")
-                edit_link.attr('href', @settings.editUrl.replace(/\:identifier/, item[@settings.identifierAttribute]))
+                edit_link.attr('href', insertItemAttributesIntoString(item, @settings.editUrl))
                 actions_cell.append(edit_link)
               if @settings.destroyLink
                 destroy_link = $("<a href='#'>Destroy</a>")
-                destroy_link.attr('data-jTable-destroy-url', @settings.destroyUrl.replace(/\:identifier/, item[@settings.identifierAttribute]))
+                destroy_link.attr('data-jTable-destroy-url', insertItemAttributesIntoString(item, @settings.destroyUrl))
                 destroy_link.click (event) =>
                   $.ajax({
                     url: $(event.currentTarget).attr('data-jTable-destroy-url')
@@ -328,6 +335,12 @@
           updatePageInfo()
           updatePagination()
         
+      insertItemAttributesIntoString = (item, str) =>
+        str = str.toString()
+        for name, value of item
+          str = str.replace(RegExp("(:#{name}:)"), encodeURIComponent(value))
+        str
+      
       @settings = $.extend(true, {}, $.jTable.defaults.settings)
       @query = {}
       $.extend true, @settings, options
@@ -342,7 +355,7 @@
       @initial_load = true
       @stale_paging = false
       @items = []
-      @show_links = @settings.viewLink or @settings.editLink or @settings.destroyLink
+      @show_links = @settings.viewLink or @settings.editLink or @settings.destroyLink or @settings.otherActions != []
       @container.data('jTable', {})
       @container.data('jTable').settings = @settings
       @previous_query = $.extend(true, {}, @query)

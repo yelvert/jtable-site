@@ -1,4 +1,4 @@
-/* DO NOT MODIFY. This file was compiled Wed, 26 Jan 2011 21:03:52 GMT from
+/* DO NOT MODIFY. This file was compiled Thu, 27 Jan 2011 21:24:06 GMT from
  * /Users/yelvert/projects/jtable/app/coffeescripts/jTable.coffee
  */
 
@@ -20,14 +20,15 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         width: '',
         indexUrl: '',
         viewLink: true,
-        viewUrl: '?id=:identifier',
+        viewUrl: '?id=:id',
         editLink: true,
-        editUrl: 'edit?id=:identifier',
+        editUrl: 'edit?id=:id',
         destroyLink: true,
-        destroyUrl: '?id=:identifier',
+        destroyUrl: '?id=:id',
         onDestroy: function() {
           return alert('Item successfully destroyed.');
-        }
+        },
+        otherActions: []
       },
       column: {
         searchable: true,
@@ -44,7 +45,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
       options = {};
     }
     return this.each(function() {
-      var buildAll, buildBottomToolbar, buildPerPageSelect, buildSearch, buildTable, buildTableFoot, buildTableHead, buildTopToolbar, changePage, column, fetchItems, generateBaseQuery, i, updateItems, updatePageInfo, updatePagination, updateProcessingOverlay, updateTableRows, _len, _ref;
+      var buildAll, buildBottomToolbar, buildPerPageSelect, buildSearch, buildTable, buildTableFoot, buildTableHead, buildTopToolbar, changePage, column, fetchItems, generateBaseQuery, i, insertItemAttributesIntoString, updateItems, updatePageInfo, updatePagination, updateProcessingOverlay, updateTableRows, _len, _ref;
       buildAll = __bind(function() {
         buildTopToolbar();
         buildTable();
@@ -221,7 +222,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         }
       }, this);
       updateTableRows = __bind(function() {
-        var actions_cell, blank_row, column, column_count, destroy_link, edit_link, i, item, new_cell, new_row, table_body, view_link, _i, _len, _len2, _ref, _ref2, _results;
+        var action, action_link, actions_cell, blank_row, column, column_count, destroy_link, edit_link, i, item, name, new_cell, new_row, table_body, value, view_link, _i, _j, _len, _len2, _len3, _ref, _ref2, _ref3, _results;
         table_body = $('tbody', this.table);
         table_body.html('');
         if (this.items_count === 0) {
@@ -266,19 +267,31 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
             }
             if (this.show_links) {
               actions_cell = $('<td class="jTable-actions-cell jTable-cell"></td>');
+              _ref3 = this.settings.otherActions;
+              for (_j = 0, _len3 = _ref3.length; _j < _len3; _j++) {
+                action = _ref3[_j];
+                action_link = $("<a>" + action.title + "</a>");
+                for (name in action) {
+                  value = action[name];
+                  if (name !== "title") {
+                    action_link.attr(name, insertItemAttributesIntoString(item, value));
+                  }
+                }
+                actions_cell.append(action_link);
+              }
               if (this.settings.viewLink) {
                 view_link = $("<a>View</a>");
-                view_link.attr('href', this.settings.viewUrl.replace(/\:identifier/, item[this.settings.identifierAttribute]));
+                view_link.attr('href', insertItemAttributesIntoString(item, this.settings.viewUrl));
                 actions_cell.append(view_link);
               }
               if (this.settings.editLink) {
                 edit_link = $("<a>Edit</a>");
-                edit_link.attr('href', this.settings.editUrl.replace(/\:identifier/, item[this.settings.identifierAttribute]));
+                edit_link.attr('href', insertItemAttributesIntoString(item, this.settings.editUrl));
                 actions_cell.append(edit_link);
               }
               if (this.settings.destroyLink) {
                 destroy_link = $("<a href='#'>Destroy</a>");
-                destroy_link.attr('data-jTable-destroy-url', this.settings.destroyUrl.replace(/\:identifier/, item[this.settings.identifierAttribute]));
+                destroy_link.attr('data-jTable-destroy-url', insertItemAttributesIntoString(item, this.settings.destroyUrl));
                 destroy_link.click(__bind(function(event) {
                   $.ajax({
                     url: $(event.currentTarget).attr('data-jTable-destroy-url'),
@@ -431,6 +444,15 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
           return updatePagination();
         }
       }, this);
+      insertItemAttributesIntoString = __bind(function(item, str) {
+        var name, value;
+        str = str.toString();
+        for (name in item) {
+          value = item[name];
+          str = str.replace(RegExp("(:" + name + ":)"), encodeURIComponent(value));
+        }
+        return str;
+      }, this);
       this.settings = $.extend(true, {}, $.jTable.defaults.settings);
       this.query = {};
       $.extend(true, this.settings, options);
@@ -453,7 +475,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
       this.initial_load = true;
       this.stale_paging = false;
       this.items = [];
-      this.show_links = this.settings.viewLink || this.settings.editLink || this.settings.destroyLink;
+      this.show_links = this.settings.viewLink || this.settings.editLink || this.settings.destroyLink || this.settings.otherActions !== [];
       this.container.data('jTable', {});
       this.container.data('jTable').settings = this.settings;
       this.previous_query = $.extend(true, {}, this.query);
