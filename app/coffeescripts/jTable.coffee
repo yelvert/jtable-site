@@ -8,7 +8,7 @@
         perPage: 25
         perPageOptions: [25,50,100]
         fullPagination: true
-        serverSidePagination: false
+        serverSidePagination: true
         ajaxInterval: 250
         noItemsMsg: "No Records were found."
         rowClass: ''

@@ -5,6 +5,7 @@
 <script type="text/javascript" charset="utf-8">
   $("#widgets").jTable({
     width: '100%',
+    serverSidePagination: false,
     indexUrl: "/widgets/client_side.json",
     editUrl: "/widgets/:identifier/edit",
     destroyUrl: "/widgets/:identifier.js",

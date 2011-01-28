@@ -1,6 +1,6 @@
 module ActiveRecord
   class Base
-    def self.from_jtable_query(query, serverSidePagination)
+    def self.from_jtable_query(query, serverSidePagination = true)
       rel = self
       unless query.nil?
         unless query[:search].blank?
@@ -38,10 +38,10 @@ module ActiveRecord
         if serverSidePagination
           total_items = rel.count
           if query[:limit]
-            rel = rel.limit(query[:limit])
+            rel = rel.limit(query[:limit].to_i)
           end
           if query[:offset]
-            rel = rel.offset(query[:offset])
+            rel = rel.offset(query[:offset].to_i)
           end
         end
       end
