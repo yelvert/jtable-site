@@ -1,4 +1,4 @@
-/* DO NOT MODIFY. This file was compiled Thu, 27 Jan 2011 21:24:06 GMT from
+/* DO NOT MODIFY. This file was compiled Mon, 31 Jan 2011 06:35:42 GMT from
  * /Users/yelvert/projects/jtable/app/coffeescripts/jTable.coffee
  */
 
@@ -13,7 +13,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         perPage: 25,
         perPageOptions: [25, 50, 100],
         fullPagination: true,
-        serverSidePagination: false,
+        serverSidePagination: true,
         ajaxInterval: 250,
         noItemsMsg: "No Records were found.",
         rowClass: '',
@@ -21,6 +21,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         indexUrl: '',
         viewLink: true,
         viewUrl: '?id=:id',
+        inlineView: true,
         editLink: true,
         editUrl: 'edit?id=:id',
         destroyLink: true,
@@ -45,7 +46,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
       options = {};
     }
     return this.each(function() {
-      var buildAll, buildBottomToolbar, buildPerPageSelect, buildSearch, buildTable, buildTableFoot, buildTableHead, buildTopToolbar, changePage, column, fetchItems, generateBaseQuery, i, insertItemAttributesIntoString, updateItems, updatePageInfo, updatePagination, updateProcessingOverlay, updateTableRows, _len, _ref;
+      var buildAll, buildBottomToolbar, buildPerPageSelect, buildSearch, buildTable, buildTableFoot, buildTableHead, buildTopToolbar, changePage, column, fetchItems, generateBaseQuery, i, insertInfoRowForItem, insertItemAttributesIntoString, updateItems, updatePageInfo, updatePagination, updateProcessingOverlay, updateTableRows, _len, _ref;
       buildAll = __bind(function() {
         buildTopToolbar();
         buildTable();
@@ -280,8 +281,25 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
                 actions_cell.append(action_link);
               }
               if (this.settings.viewLink) {
-                view_link = $("<a>View</a>");
-                view_link.attr('href', insertItemAttributesIntoString(item, this.settings.viewUrl));
+                if (this.settings.inlineView) {
+                  view_link = $("<a href='#'>View</a>");
+                  view_link.attr('data-jTable-view-url', insertItemAttributesIntoString(item, this.settings.viewUrl));
+                  view_link.click(__bind(function(event) {
+                    return $.ajax({
+                      url: $(event.currentTarget).attr('data-jTable-view-url'),
+                      type: 'GET',
+                      success: __bind(function(data, status, xhr) {
+                        return insertInfoRowForItem($(event.currentTarget), data);
+                      }, this),
+                      error: __bind(function(xhr, status, error) {
+                        return this.element.trigger('ajax:error', [xhr, status, error]);
+                      }, this)
+                    });
+                  }, this));
+                } else {
+                  view_link = $("<a>View</a>");
+                  view_link.attr('href', insertItemAttributesIntoString(item, this.settings.viewUrl));
+                }
                 actions_cell.append(view_link);
               }
               if (this.settings.editLink) {
@@ -303,7 +321,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
                       return this.settings.onDestroy(data);
                     }, this),
                     error: __bind(function(xhr, status, error) {
-                      return element.trigger('ajax:error', [xhr, status, error]);
+                      return this.element.trigger('ajax:error', [xhr, status, error]);
                     }, this)
                   });
                   return fetchItems();
@@ -452,6 +470,22 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
           str = str.replace(RegExp("(:" + name + ":)"), encodeURIComponent(value));
         }
         return str;
+      }, this);
+      insertInfoRowForItem = __bind(function(target, data) {
+        var close_btn, info_container, info_row, item_row;
+        item_row = target.closest('tr');
+        info_row = $("<tr class='jTable-info-row'></tr>");
+        info_row.attr('data-jTable-item-identifier', item_row.attr('data-jTable-item-identifier'));
+        info_container = $('<td></td>');
+        info_container.attr('colspan', this.show_links ? this.settings.columns.length + 1 : this.settings.columns.length);
+        close_btn = $("<span class='jTable-close-info-row'></span>");
+        close_btn.click(__bind(function(event) {
+          return $(event.currentTarget).closest('tr').remove();
+        }, this));
+        info_container.append(close_btn);
+        info_container.append(data);
+        info_row.append(info_container);
+        return info_row.insertAfter(item_row);
       }, this);
       this.settings = $.extend(true, {}, $.jTable.defaults.settings);
       this.query = {};

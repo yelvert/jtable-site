@@ -16,6 +16,7 @@
         indexUrl: ''
         viewLink: true
         viewUrl: '?id=:id'
+        inlineView: true
         editLink: true
         editUrl: 'edit?id=:id'
         destroyLink: true
@@ -208,8 +209,21 @@
                     action_link.attr(name, insertItemAttributesIntoString(item, value))
                 actions_cell.append(action_link)
               if @settings.viewLink
-                view_link = $("<a>View</a>")
-                view_link.attr('href', insertItemAttributesIntoString(item, @settings.viewUrl))
+                if @settings.inlineView
+                  view_link = $("<a href='#'>View</a>")
+                  view_link.attr('data-jTable-view-url', insertItemAttributesIntoString(item, @settings.viewUrl))
+                  view_link.click (event) =>
+                    $.ajax({
+                      url: $(event.currentTarget).attr('data-jTable-view-url')
+                      type: 'GET'
+                      success: (data, status, xhr) =>
+                        insertInfoRowForItem($(event.currentTarget),data)
+                      error: (xhr, status, error) =>
+                        @element.trigger('ajax:error', [xhr, status, error]);
+                    })
+                else
+                  view_link = $("<a>View</a>")
+                  view_link.attr('href', insertItemAttributesIntoString(item, @settings.viewUrl))
                 actions_cell.append(view_link)
               if @settings.editLink
                 edit_link = $("<a>Edit</a>")
@@ -226,7 +240,7 @@
                     success: (data, status, xhr) =>
                       @settings.onDestroy(data)
                     error: (xhr, status, error) =>
-                      element.trigger('ajax:error', [xhr, status, error]);
+                      @element.trigger('ajax:error', [xhr, status, error]);
                   })
                   fetchItems()
                 actions_cell.append(destroy_link)
@@ -340,6 +354,20 @@
         for name, value of item
           str = str.replace(RegExp("(:#{name}:)"), encodeURIComponent(value))
         str
+        
+      insertInfoRowForItem = (target, data) =>
+        item_row = target.closest('tr')
+        info_row = $("<tr class='jTable-info-row'></tr>")
+        info_row.attr('data-jTable-item-identifier', item_row.attr('data-jTable-item-identifier'))
+        info_container = $('<td></td>')
+        info_container.attr('colspan', if @show_links then @settings.columns.length+1 else @settings.columns.length)
+        close_btn = $("<span class='jTable-close-info-row'></span>")
+        close_btn.click (event) =>
+          $(event.currentTarget).closest('tr').remove()
+        info_container.append(close_btn)
+        info_container.append(data)
+        info_row.append(info_container)
+        info_row.insertAfter(item_row)
       
       @settings = $.extend(true, {}, $.jTable.defaults.settings)
       @query = {}

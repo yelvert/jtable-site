@@ -19,7 +19,7 @@ class IcdCodesController < ApplicationController
     @icd_code = IcdCode.find(params[:id])
 
     respond_to do |format|
-      format.html # show.html.erb
+      format.html { render :layout => false }
       format.xml  { render :xml => @icd_code }
     end
   end

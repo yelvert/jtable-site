@@ -121,6 +121,33 @@ dark-blue:    rgb(39,121,170)
   padding: 0 5px;
 }
 
+.jTable-info-row {
+  
+}
+
+.jTable-info-row td {
+  border-top: 1px solid rgb(39,121,170);
+  border-bottom: 1px solid rgb(39,121,170);
+}
+
+.jTable-info-row td span.jTable-close-info-row {
+  width: 16px;
+  height: 16px;
+  background-image: url(/images/jTable-icons.png);
+  display: block;
+  text-indent: -99999px;
+  overflow: hidden;
+  background-repeat: no-repeat;
+  float: right;
+  background-position: -96px -128px;
+  -moz-border-radius: 6px;
+  -webkit-border-radius: 6px;
+  border-radius: 6px;
+  border: 1px solid rgb(39,121,170);
+  padding: 0 1px 1px 0;
+  margin: 2px;
+}
+
 .jTable-column-footer {
   border-left: 1px solid rgb(39,121,170);
   border-top: 1px solid rgb(39,121,170);
