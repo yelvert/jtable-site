@@ -1,4 +1,4 @@
-/* DO NOT MODIFY. This file was compiled Mon, 31 Jan 2011 06:35:42 GMT from
+/* DO NOT MODIFY. This file was compiled Tue, 01 Feb 2011 22:51:06 GMT from
  * /Users/yelvert/projects/jtable/app/coffeescripts/jTable.coffee
  */
 
@@ -285,6 +285,8 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
                   view_link = $("<a href='#'>View</a>");
                   view_link.attr('data-jTable-view-url', insertItemAttributesIntoString(item, this.settings.viewUrl));
                   view_link.click(__bind(function(event) {
+                    console.log("tr.jTable-info-row[data-jtable-item-identifier=" + ($(event.target).closest('tr').attr('data-jTable-item-identifier')) + "]");
+                    $("tr.jTable-info-row[data-jTable-item-identifier=" + ($(event.target).closest('tr').attr('data-jTable-item-identifier')) + "]").remove();
                     return $.ajax({
                       url: $(event.currentTarget).attr('data-jTable-view-url'),
                       type: 'GET',
@@ -485,7 +487,8 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         info_container.append(close_btn);
         info_container.append(data);
         info_row.append(info_container);
-        return info_row.insertAfter(item_row);
+        info_row.insertAfter(item_row);
+        return window.scrollTo(item_row.position().left, item_row.position().top);
       }, this);
       this.settings = $.extend(true, {}, $.jTable.defaults.settings);
       this.query = {};

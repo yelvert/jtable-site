@@ -213,6 +213,8 @@
                   view_link = $("<a href='#'>View</a>")
                   view_link.attr('data-jTable-view-url', insertItemAttributesIntoString(item, @settings.viewUrl))
                   view_link.click (event) =>
+                    console.log "tr.jTable-info-row[data-jtable-item-identifier=#{$(event.target).closest('tr').attr('data-jTable-item-identifier')}]"
+                    $("tr.jTable-info-row[data-jTable-item-identifier=#{$(event.target).closest('tr').attr('data-jTable-item-identifier')}]").remove()
                     $.ajax({
                       url: $(event.currentTarget).attr('data-jTable-view-url')
                       type: 'GET'
@@ -368,6 +370,7 @@
         info_container.append(data)
         info_row.append(info_container)
         info_row.insertAfter(item_row)
+        window.scrollTo(item_row.position().left, item_row.position().top)
       
       @settings = $.extend(true, {}, $.jTable.defaults.settings)
       @query = {}
