@@ -234,6 +234,7 @@
               if @settings.destroyLink
                 destroy_link = $("<a href='#'>Destroy</a>")
                 destroy_link.attr('data-jTable-destroy-url', insertItemAttributesIntoString(item, @settings.destroyUrl))
+                destroy_link.attr('data-confirm', true)
                 destroy_link.click (event) =>
                   $.ajax({
                     url: $(event.currentTarget).attr('data-jTable-destroy-url')
