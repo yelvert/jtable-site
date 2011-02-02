@@ -22,7 +22,8 @@
         destroyLink: true
         destroyUrl: '?id=:id'
         onDestroy: ->
-          alert('Item successfully destroyed.')
+          
+        destroyConfirmMsg: "Are you sure?"
         otherActions: []
       column:
         searchable: true
@@ -234,18 +235,18 @@
               if @settings.destroyLink
                 destroy_link = $("<a href='#'>Destroy</a>")
                 destroy_link.attr('data-jTable-destroy-url', insertItemAttributesIntoString(item, @settings.destroyUrl))
-                destroy_link.attr('data-confirm', true)
                 destroy_link.click (event) =>
-                  $.ajax({
-                    url: $(event.currentTarget).attr('data-jTable-destroy-url')
-                    type: 'POST'
-                    data: {'_method': 'DELETE'}
-                    success: (data, status, xhr) =>
-                      @settings.onDestroy(data)
-                    error: (xhr, status, error) =>
-                      @element.trigger('ajax:error', [xhr, status, error]);
-                  })
-                  fetchItems()
+                  if (confirm(@settings.destroyConfirmMsg))
+                    $.ajax({
+                      url: $(event.currentTarget).attr('data-jTable-destroy-url')
+                      type: 'POST'
+                      data: {'_method': 'DELETE'}
+                      success: (data, status, xhr) =>
+                        @settings.onDestroy(data)
+                      error: (xhr, status, error) =>
+                        @element.trigger('ajax:error', [xhr, status, error]);
+                    })
+                    fetchItems()
                 actions_cell.append(destroy_link)
               new_row.append(actions_cell)
             table_body.append(new_row)

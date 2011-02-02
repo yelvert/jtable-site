@@ -79,6 +79,7 @@ class IcdCodesController < ApplicationController
     @icd_code.destroy
 
     respond_to do |format|
+      format.js   { head :ok }
       format.html { redirect_to(icd_codes_url) }
       format.xml  { head :ok }
     end

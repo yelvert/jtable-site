@@ -1,4 +1,4 @@
-/* DO NOT MODIFY. This file was compiled Tue, 01 Feb 2011 22:51:06 GMT from
+/* DO NOT MODIFY. This file was compiled Wed, 02 Feb 2011 00:43:50 GMT from
  * /Users/yelvert/projects/jtable/app/coffeescripts/jTable.coffee
  */
 
@@ -26,9 +26,8 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         editUrl: 'edit?id=:id',
         destroyLink: true,
         destroyUrl: '?id=:id',
-        onDestroy: function() {
-          return alert('Item successfully destroyed.');
-        },
+        onDestroy: function() {},
+        destroyConfirmMsg: "Are you sure?",
         otherActions: []
       },
       column: {
@@ -313,20 +312,22 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
                 destroy_link = $("<a href='#'>Destroy</a>");
                 destroy_link.attr('data-jTable-destroy-url', insertItemAttributesIntoString(item, this.settings.destroyUrl));
                 destroy_link.click(__bind(function(event) {
-                  $.ajax({
-                    url: $(event.currentTarget).attr('data-jTable-destroy-url'),
-                    type: 'POST',
-                    data: {
-                      '_method': 'DELETE'
-                    },
-                    success: __bind(function(data, status, xhr) {
-                      return this.settings.onDestroy(data);
-                    }, this),
-                    error: __bind(function(xhr, status, error) {
-                      return this.element.trigger('ajax:error', [xhr, status, error]);
-                    }, this)
-                  });
-                  return fetchItems();
+                  if (confirm(this.settings.destroyConfirmMsg)) {
+                    $.ajax({
+                      url: $(event.currentTarget).attr('data-jTable-destroy-url'),
+                      type: 'POST',
+                      data: {
+                        '_method': 'DELETE'
+                      },
+                      success: __bind(function(data, status, xhr) {
+                        return this.settings.onDestroy(data);
+                      }, this),
+                      error: __bind(function(xhr, status, error) {
+                        return this.element.trigger('ajax:error', [xhr, status, error]);
+                      }, this)
+                    });
+                    return fetchItems();
+                  }
                 }, this));
                 actions_cell.append(destroy_link);
               }
