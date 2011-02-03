@@ -1,4 +1,4 @@
-/* DO NOT MODIFY. This file was compiled Wed, 02 Feb 2011 00:43:50 GMT from
+/* DO NOT MODIFY. This file was compiled Thu, 03 Feb 2011 00:27:45 GMT from
  * /Users/yelvert/projects/jtable/app/coffeescripts/jTable.coffee
  */
 
@@ -284,7 +284,6 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
                   view_link = $("<a href='#'>View</a>");
                   view_link.attr('data-jTable-view-url', insertItemAttributesIntoString(item, this.settings.viewUrl));
                   view_link.click(__bind(function(event) {
-                    console.log("tr.jTable-info-row[data-jtable-item-identifier=" + ($(event.target).closest('tr').attr('data-jTable-item-identifier')) + "]");
                     $("tr.jTable-info-row[data-jTable-item-identifier=" + ($(event.target).closest('tr').attr('data-jTable-item-identifier')) + "]").remove();
                     return $.ajax({
                       url: $(event.currentTarget).attr('data-jTable-view-url'),

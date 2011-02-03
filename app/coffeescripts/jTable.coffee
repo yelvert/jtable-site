@@ -214,7 +214,6 @@
                   view_link = $("<a href='#'>View</a>")
                   view_link.attr('data-jTable-view-url', insertItemAttributesIntoString(item, @settings.viewUrl))
                   view_link.click (event) =>
-                    console.log "tr.jTable-info-row[data-jtable-item-identifier=#{$(event.target).closest('tr').attr('data-jTable-item-identifier')}]"
                     $("tr.jTable-info-row[data-jTable-item-identifier=#{$(event.target).closest('tr').attr('data-jTable-item-identifier')}]").remove()
                     $.ajax({
                       url: $(event.currentTarget).attr('data-jTable-view-url')
