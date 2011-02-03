@@ -1,4 +1,4 @@
-/* DO NOT MODIFY. This file was compiled Thu, 03 Feb 2011 00:27:45 GMT from
+/* DO NOT MODIFY. This file was compiled Thu, 03 Feb 2011 07:18:14 GMT from
  * /Users/yelvert/projects/jtable/app/coffeescripts/jTable.coffee
  */
 
@@ -13,7 +13,6 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         perPage: 25,
         perPageOptions: [25, 50, 100],
         fullPagination: true,
-        serverSidePagination: true,
         ajaxInterval: 250,
         noItemsMsg: "No Records were found.",
         rowClass: '',
@@ -92,14 +91,8 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
       }, this);
       updateItems = __bind(function(data) {
         var item, items, _i, _len;
-        if (this.settings.serverSidePagination) {
-          this.items_count = data.total_items;
-          items = data.items;
-        } else {
-          this.items_count = data.length;
-          items = data;
-          this.page = 1;
-        }
+        this.items_count = data.total_items;
+        items = data.items;
         this.items = [];
         for (_i = 0, _len = items.length; _i < _len; _i++) {
           item = items[_i];
@@ -435,33 +428,20 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         return $(".jTable-pagination-button[data-jTable-pagination-page=" + this.page + "]", this.container).addClass('jTable-pagination-current-page');
       }, this);
       changePage = __bind(function(new_page) {
-        var i;
-        if (this.settings.serverSidePagination) {
-          if (this.initial_load) {
+        if (this.initial_load) {
+          this.page = new_page;
+          updatePageInfo();
+          return updatePagination();
+        } else {
+          if (this.stale_paging) {
+            this.query.offset = (new_page - 1) * this.settings.perPage;
+            this.page = new_page;
+            return fetchItems();
+          } else {
             this.page = new_page;
             updatePageInfo();
             return updatePagination();
-          } else {
-            if (this.stale_paging) {
-              this.query.offset = (new_page - 1) * this.settings.perPage;
-              this.page = new_page;
-              return fetchItems();
-            } else {
-              this.page = new_page;
-              updatePageInfo();
-              return updatePagination();
-            }
           }
-        } else {
-          this.page = new_page;
-          $('tr[data-jTable-row-index]', this.table).hide();
-          i = (this.page - 1) * this.settings.perPage;
-          while (i < this.page * this.settings.perPage) {
-            $("tr[data-jTable-row-index='" + i + "']", this.table).show();
-            i++;
-          }
-          updatePageInfo();
-          return updatePagination();
         }
       }, this);
       insertItemAttributesIntoString = __bind(function(item, str) {

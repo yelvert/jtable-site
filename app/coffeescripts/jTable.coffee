@@ -8,7 +8,6 @@
         perPage: 25
         perPageOptions: [25,50,100]
         fullPagination: true
-        serverSidePagination: true
         ajaxInterval: 250
         noItemsMsg: "No Records were found."
         rowClass: ''
@@ -71,13 +70,8 @@
           @previous_query = $.extend(true, {}, current_query)
         
       updateItems = (data) =>
-        if @settings.serverSidePagination
-          @items_count = data.total_items
-          items = data.items
-        else
-          @items_count = data.length
-          items = data
-          @page = 1
+        @items_count = data.total_items
+        items = data.items
         @items = []
         for item in items
           @items.push item
@@ -328,29 +322,19 @@
         $(".jTable-pagination-button[data-jTable-pagination-page=#{@page}]", @container).addClass('jTable-pagination-current-page')
         
       changePage = (new_page) =>
-        if @settings.serverSidePagination
-          if @initial_load
+        if @initial_load
+          @page = new_page
+          updatePageInfo()
+          updatePagination()
+        else
+          if @stale_paging
+            @query.offset = ((new_page-1)*@settings.perPage)
+            @page = new_page
+            fetchItems()
+          else
             @page = new_page
             updatePageInfo()
             updatePagination()
-          else
-            if @stale_paging
-              @query.offset = ((new_page-1)*@settings.perPage)
-              @page = new_page
-              fetchItems()
-            else
-              @page = new_page
-              updatePageInfo()
-              updatePagination()
-        else
-          @page = new_page
-          $('tr[data-jTable-row-index]',@table).hide()
-          i = (@page-1)*@settings.perPage
-          while (i < @page*@settings.perPage)
-            $("tr[data-jTable-row-index='#{i}']",@table).show()
-            i++
-          updatePageInfo()
-          updatePagination()
         
       insertItemAttributesIntoString = (item, str) =>
         str = str.toString()

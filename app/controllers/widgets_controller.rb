@@ -11,16 +11,6 @@ class WidgetsController < ApplicationController
     end
   end
   
-  def client_side
-    respond_to do |format|
-      format.html {}
-      format.json {
-        @widgets = Widget.jtable_query(params[:jTableQuery])
-        render :json => @widgets
-      }
-    end
-  end
-  
   # GET /widgets/1
   # GET /widgets/1.xml
   def show
