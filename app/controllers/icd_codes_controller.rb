@@ -2,13 +2,12 @@ class IcdCodesController < ApplicationController
   # GET /icd_codes
   # GET /icd_codes.xml
   def index
-    @icd_codes = IcdCode.from_jtable_query(params[:jTableQuery], true)
-
     respond_to do |format|
-      format.html do
-        #@widgets = Widget.all
-      end
-      format.json { render :json => @icd_codes }
+      format.html {}
+      format.json {
+        @icd_codes = IcdCode.jtable_query(params[:jTableQuery])
+        render :json => jtable_for_json(@icd_codes, params[:jTableQuery])
+      }
       format.xml  { render :xml => @icd_codes }
     end
   end

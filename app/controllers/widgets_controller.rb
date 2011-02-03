@@ -2,29 +2,25 @@ class WidgetsController < ApplicationController
   # GET /widgets
   # GET /widgets.xml
   def index
-    @widgets = Widget.from_jtable_query(params[:jTableQuery], true)
-
     respond_to do |format|
-      format.html do
-        #@widgets = Widget.all
-      end
-      format.json { render :json => @widgets }
-      format.xml  { render :xml => @widgets }
+      format.html {}
+      format.json {
+        @widgets = Widget.jtable_query(params[:jTableQuery])
+        render :json => jtable_for_json(@widgets, params[:jTableQuery])
+      }
     end
   end
   
   def client_side
-    @widgets = Widget.from_jtable_query(params[:jTableQuery], false)
-
     respond_to do |format|
-      format.html do
-        #@widgets = Widget.all
-      end
-      format.json { render :json => @widgets.all }
-      format.xml  { render :xml => @widgets }
+      format.html {}
+      format.json {
+        @widgets = Widget.jtable_query(params[:jTableQuery])
+        render :json => @widgets
+      }
     end
   end
-
+  
   # GET /widgets/1
   # GET /widgets/1.xml
   def show

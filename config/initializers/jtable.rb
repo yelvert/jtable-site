@@ -1,55 +1,88 @@
-module ActiveRecord
-  class Base
-    def self.from_jtable_query(query, serverSidePagination = true)
-      rel = self
-      unless query.nil?
-        unless query[:search].blank?
-          search_terms = query[:search].split(" ")
-          search_terms.each do |term|
-            where_query = []
-            query[:searchable_columns].each do |column|
-              unless [:date].include? rel.arel_table[column.to_sym].column.type
-                if [:integer, :boolean].include? rel.arel_table[column.to_sym].column.type
-                  where_query << rel.arel_table[column.to_sym].eq(term.to_i)
+module JTable
+  module ActiveRecord
+    extend ActiveSupport::Concern
+    module ClassMethods
+      def jtable(*fields)
+        fields.each do |field|
+          self.class.instance_eval do
+            define_method "jtable_search_#{field}" do |term|
+              unless [:date].include? arel_table[field.to_sym].column.type
+                if [:integer, :boolean].include? arel_table[field.to_sym].column.type
+                  arel_table[field.to_sym].eq(term.to_i)
                 else
-                  where_query << rel.arel_table[column.to_sym].matches("%#{term}%")
+                  arel_table[field.to_sym].matches("%#{term}%")
                 end
               end
             end
-            rel = rel.where(where_query.inject(&:or))
-          end
-        end
-        unless query[:column_search].blank?
-          query[:column_search].each_pair do |column,search|
-            unless [:date].include? rel.arel_table[column.to_sym].column.type
-              if [:integer, :boolean].include? rel.arel_table[column.to_sym].column.type
-                rel = rel.where(rel.arel_table[column.to_sym].eq(search))
-              else
-                search.split(" ").each do |term|
-                  rel = rel.where(rel.arel_table[column.to_sym].matches("%#{term}%"))
-                end
-              end
+            
+            define_method "jtable_order_#{field}" do |direction|
+              "#{field} #{direction}"
             end
           end
         end
-        unless query[:sort_column].blank? and query[:sort_direction].blank?
-          rel = rel.order("#{query[:sort_column]} #{query[:sort_direction]}")
-        end
-        if serverSidePagination
-          total_items = rel.count
-          if query[:limit]
-            rel = rel.limit(query[:limit].to_i)
+        
+        scope :jtable_search, lambda { |search_terms|
+          unless search_terms.blank?
+            wheres = []
+            search_terms.split(" ").each do |term|
+              where_query = []
+              fields.each do |field|
+                where_query << self.send("jtable_search_#{field}", term)
+              end
+              wheres << where(where_query.inject(&:or))
+            end
+            wheres.inject(&:&)
           end
-          if query[:offset]
-            rel = rel.offset(query[:offset].to_i)
+        }
+        
+        scope :jtable_single_search, lambda {|column, search_terms|
+          unless column.blank? or search_terms.blank?
+            wheres = []
+            search_terms.split(" ").each do |term|
+              wheres << where(self.send("jtable_search_#{column}", term))
+            end
+            wheres.inject(&:&)
           end
-        end
-      end
-      if serverSidePagination
-        {:total_items => total_items, :items => rel}
-      else
-        rel
+        }
+        
+        scope :jtable_order, lambda {|column, direction|
+          if !column.blank? and !direction.blank? and %w(asc desc).include?(direction.downcase)
+            order(self.send("jtable_order_#{column}", direction))
+          end
+        }
+        
+        scope :jtable_paginate, lambda {|per_page, page_start|
+          limit(per_page.to_i).offset(page_start.to_i)
+        }
+        
+        scope :jtable_default, lambda {
+          
+        }
+        
+        scope :jtable_query, lambda { |jtable_params|
+          jtable_params = HashWithIndifferentAccess.new(jtable_params)
+          queries = []
+          queries << jtable_default()
+          queries << jtable_search(jtable_params[:search])
+          unless jtable_params[:column_search].blank?
+            jtable_params[:column_search].each_pair do |column, search|
+              queries << jtable_single_search(column, search)
+            end
+          end
+          queries << jtable_order(jtable_params[:sort_column], jtable_params[:sort_direction])
+          queries.inject(&:&)
+        }
       end
     end
   end
+  
+  module ActionController
+    def jtable_for_json(rel, jtable_params)
+      jtable_params = HashWithIndifferentAccess.new(jtable_params)
+      {:total_items => rel.count, :items => rel.jtable_paginate(jtable_params[:limit], jtable_params[:offset])}
+    end
+  end
 end
+
+::ActiveRecord::Base.send(:include, JTable::ActiveRecord)
+::ActionController::Base.send(:include, JTable::ActionController)
