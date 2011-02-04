@@ -21,12 +21,14 @@ module JTable
           end
         end
         
-        scope :jtable_search, lambda { |search_terms|
+        scope :jtable_search, lambda { |jtable_params|
+          search_terms = jtable_params[:search]
           unless search_terms.blank?
             wheres = []
             search_terms.split(" ").each do |term|
               where_query = []
               fields.each do |field|
+                next unless jtable_params[:searchable_columns].include?(field)
                 where_query << self.send("jtable_search_#{field}", term)
               end
               wheres << where(where_query.inject(&:or))
@@ -63,7 +65,7 @@ module JTable
           jtable_params = HashWithIndifferentAccess.new(jtable_params)
           queries = []
           queries << jtable_default()
-          queries << jtable_search(jtable_params[:search])
+          queries << jtable_search(jtable_params)
           unless jtable_params[:column_search].blank?
             jtable_params[:column_search].each_pair do |column, search|
               queries << jtable_single_search(column, search)
