@@ -31,7 +31,7 @@ module JTable
             search_terms.split(" ").each do |term|
               where_query = []
               fields.each do |field|
-                next unless jtable_params[:searchable_columns].include?(field)
+                next unless jtable_params[:searchable_columns].include?(field.to_s)
                 where_query << self.send("jtable_search_#{field}", term)
               end
               wheres << where(where_query.inject(&:or))
