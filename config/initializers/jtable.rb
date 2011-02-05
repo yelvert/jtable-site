@@ -3,8 +3,11 @@ module JTable
     extend ActiveSupport::Concern
     module ClassMethods
       def jtable(*fields)
+        metaclass = class << self
+          self
+        end
         fields.each do |field|
-          self.class.instance_eval do
+          metaclass.instance_eval do 
             define_method "jtable_search_#{field}" do |term|
               unless [:date].include? arel_table[field.to_sym].column.type
                 if [:integer, :boolean].include? arel_table[field.to_sym].column.type
@@ -14,7 +17,7 @@ module JTable
                 end
               end
             end
-            
+        
             define_method "jtable_order_#{field}" do |direction|
               "#{field} #{direction}"
             end
