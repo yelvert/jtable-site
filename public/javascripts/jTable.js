@@ -1,5 +1,5 @@
-/* DO NOT MODIFY. This file was compiled Thu, 03 Feb 2011 07:18:14 GMT from
- * /Users/yelvert/projects/jtable/app/coffeescripts/jTable.coffee
+/* DO NOT MODIFY. This file was compiled Thu, 10 Feb 2011 23:15:53 GMT from
+ * /Users/yelvert/projects/jtable/jtable-site/app/coffeescripts/jTable.coffee
  */
 
 var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
@@ -19,12 +19,12 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
         width: '',
         indexUrl: '',
         viewLink: true,
-        viewUrl: '?id=:id',
+        viewUrl: '?id=:id:',
         inlineView: true,
         editLink: true,
-        editUrl: 'edit?id=:id',
+        editUrl: 'edit?id=:id:',
         destroyLink: true,
-        destroyUrl: '?id=:id',
+        destroyUrl: '?id=:id:',
         onDestroy: function() {},
         destroyConfirmMsg: "Are you sure?",
         otherActions: []
@@ -305,20 +305,20 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
                 destroy_link.attr('data-jTable-destroy-url', insertItemAttributesIntoString(item, this.settings.destroyUrl));
                 destroy_link.click(__bind(function(event) {
                   if (confirm(this.settings.destroyConfirmMsg)) {
-                    $.ajax({
+                    return $.ajax({
                       url: $(event.currentTarget).attr('data-jTable-destroy-url'),
                       type: 'POST',
                       data: {
                         '_method': 'DELETE'
                       },
                       success: __bind(function(data, status, xhr) {
-                        return this.settings.onDestroy(data);
+                        this.settings.onDestroy(data);
+                        return fetchItems();
                       }, this),
                       error: __bind(function(xhr, status, error) {
                         return this.element.trigger('ajax:error', [xhr, status, error]);
                       }, this)
                     });
-                    return fetchItems();
                   }
                 }, this));
                 actions_cell.append(destroy_link);

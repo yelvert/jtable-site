@@ -14,12 +14,12 @@
         width: ''
         indexUrl: ''
         viewLink: true
-        viewUrl: '?id=:id'
+        viewUrl: '?id=:id:'
         inlineView: true
         editLink: true
-        editUrl: 'edit?id=:id'
+        editUrl: 'edit?id=:id:'
         destroyLink: true
-        destroyUrl: '?id=:id'
+        destroyUrl: '?id=:id:'
         onDestroy: ->
           
         destroyConfirmMsg: "Are you sure?"
@@ -236,10 +236,10 @@
                       data: {'_method': 'DELETE'}
                       success: (data, status, xhr) =>
                         @settings.onDestroy(data)
+                        fetchItems()
                       error: (xhr, status, error) =>
                         @element.trigger('ajax:error', [xhr, status, error]);
                     })
-                    fetchItems()
                 actions_cell.append(destroy_link)
               new_row.append(actions_cell)
             table_body.append(new_row)
