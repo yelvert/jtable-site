@@ -5,6 +5,7 @@ gem 'barista'
 gem 'json'
 gem 'heroku'
 gem 'taps'
+gem 'jtable-rails'
 
 group :development do
   gem 'ruby-debug19'

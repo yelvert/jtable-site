@@ -1,4 +1,4 @@
-JTable::Application.routes.draw do
+JTableSite::Application.routes.draw do
   resources :icd_codes
   
   resources :widgets

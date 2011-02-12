@@ -47,6 +47,8 @@ GEM
     i18n (0.5.0)
     json (1.4.6)
     json_pure (1.4.6)
+    jtable-rails (0.1.0)
+      rails (= 3.0.3)
     launchy (0.3.7)
       configuration (>= 0.0.5)
       rake (>= 0.8.1)
@@ -115,6 +117,7 @@ DEPENDENCIES
   barista
   heroku
   json
+  jtable-rails
   rails (= 3.0.3)
   ruby-debug19
   sqlite3-ruby

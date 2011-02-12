@@ -4,4 +4,4 @@
 require File.expand_path('../config/application', __FILE__)
 require 'rake'
 
-JTable::Application.load_tasks
+JTableSite::Application.load_tasks
